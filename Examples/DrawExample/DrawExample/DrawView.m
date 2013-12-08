@@ -19,6 +19,11 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+    RLOaddObserver(self, @selector(rloNotification:));
+}
+
 - (void)drawRect:(NSRect)dirtyRect
 {
 	[super drawRect:dirtyRect];
@@ -69,6 +74,21 @@
     [bezier3Path setLineWidth: 4];
     [bezier3Path stroke];
 
+}
+
+#ifdef RLO_ENABLED
+
+- (void)rloNotification:(NSNotification *)aNotification
+{
+    NSLog(@"rloNotification: %@", aNotification);
+    [self setNeedsDisplay:YES];
+}
+
+#endif
+
+- (void)dealloc
+{
+    RLOremoveObserver(self);
 }
 
 @end

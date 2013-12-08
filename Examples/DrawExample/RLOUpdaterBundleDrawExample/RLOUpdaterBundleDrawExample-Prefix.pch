@@ -6,11 +6,5 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-
-    #if DEBUG
-    #define RLO_ENABLED
-    #import "RLODefinitions.h"
-    #define RLO_TESTCONF_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
-    #endif
-
+    #import "DrawExample-Prefix.pch"
 #endif

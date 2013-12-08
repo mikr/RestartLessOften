@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		4CBFFE3A1854A8270005ECA9 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CBFFE391854A8270005ECA9 /* DrawView.m */; };
+		4CBFFE511854AFA90005ECA9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CBFFE4F1854AFA90005ECA9 /* InfoPlist.strings */; };
+		4CBFFE6B1854B15E0005ECA9 /* RLOBundleUpdater.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CBFFE651854B15E0005ECA9 /* RLOBundleUpdater.m */; };
+		4CBFFE6C1854B15E0005ECA9 /* RLOUnbundler.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CBFFE681854B15E0005ECA9 /* RLOUnbundler.m */; };
+		4CBFFE6D1854B15E0005ECA9 /* RLOUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CBFFE6A1854B15E0005ECA9 /* RLOUtils.m */; };
+		4CBFFEBC1854B3260005ECA9 /* RLORebuildCode.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CBFFEBB1854B3260005ECA9 /* RLORebuildCode.m */; };
+		4CBFFEBD1854B6250005ECA9 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CF0AD491853DB7D003AEA7A /* Cocoa.framework */; };
 		4CF0AD4A1853DB7D003AEA7A /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CF0AD491853DB7D003AEA7A /* Cocoa.framework */; };
 		4CF0AD541853DB7D003AEA7A /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4CF0AD521853DB7D003AEA7A /* InfoPlist.strings */; };
 		4CF0AD561853DB7D003AEA7A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 4CF0AD551853DB7D003AEA7A /* main.m */; };
@@ -22,6 +28,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4CBFFE5E1854B0B50005ECA9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4CF0AD3E1853DB7D003AEA7A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4CBFFE491854AFA90005ECA9;
+			remoteInfo = RLOUpdaterBundleDrawExample;
+		};
 		4CF0AD6B1853DB7D003AEA7A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4CF0AD3E1853DB7D003AEA7A /* Project object */;
@@ -34,6 +47,18 @@
 /* Begin PBXFileReference section */
 		4CBFFE381854A8270005ECA9 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		4CBFFE391854A8270005ECA9 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
+		4CBFFE4A1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RLOUpdaterBundleDrawExample.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4CBFFE4E1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RLOUpdaterBundleDrawExample-Info.plist"; sourceTree = "<group>"; };
+		4CBFFE501854AFA90005ECA9 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		4CBFFE541854AFA90005ECA9 /* RLOUpdaterBundleDrawExample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RLOUpdaterBundleDrawExample-Prefix.pch"; sourceTree = "<group>"; };
+		4CBFFE641854B15E0005ECA9 /* RLOBundleUpdater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLOBundleUpdater.h; sourceTree = "<group>"; };
+		4CBFFE651854B15E0005ECA9 /* RLOBundleUpdater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLOBundleUpdater.m; sourceTree = "<group>"; };
+		4CBFFE661854B15E0005ECA9 /* RLODefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLODefinitions.h; sourceTree = "<group>"; };
+		4CBFFE671854B15E0005ECA9 /* RLOUnbundler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLOUnbundler.h; sourceTree = "<group>"; };
+		4CBFFE681854B15E0005ECA9 /* RLOUnbundler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLOUnbundler.m; sourceTree = "<group>"; };
+		4CBFFE691854B15E0005ECA9 /* RLOUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLOUtils.h; sourceTree = "<group>"; };
+		4CBFFE6A1854B15E0005ECA9 /* RLOUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLOUtils.m; sourceTree = "<group>"; };
+		4CBFFEBB1854B3260005ECA9 /* RLORebuildCode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLORebuildCode.m; sourceTree = "<group>"; };
 		4CF0AD461853DB7D003AEA7A /* DrawExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DrawExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CF0AD491853DB7D003AEA7A /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		4CF0AD4C1853DB7D003AEA7A /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -56,6 +81,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		4CBFFE471854AFA90005ECA9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4CBFFEBD1854B6250005ECA9 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4CF0AD431853DB7D003AEA7A /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -76,11 +109,55 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4CBFFE4C1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample */ = {
+			isa = PBXGroup;
+			children = (
+				4CBFFE4D1854AFA90005ECA9 /* Supporting Files */,
+			);
+			path = RLOUpdaterBundleDrawExample;
+			sourceTree = "<group>";
+		};
+		4CBFFE4D1854AFA90005ECA9 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				4CBFFE4E1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample-Info.plist */,
+				4CBFFE4F1854AFA90005ECA9 /* InfoPlist.strings */,
+				4CBFFE541854AFA90005ECA9 /* RLOUpdaterBundleDrawExample-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		4CBFFE631854B15E0005ECA9 /* RLOClasses */ = {
+			isa = PBXGroup;
+			children = (
+				4CBFFE641854B15E0005ECA9 /* RLOBundleUpdater.h */,
+				4CBFFE651854B15E0005ECA9 /* RLOBundleUpdater.m */,
+				4CBFFE661854B15E0005ECA9 /* RLODefinitions.h */,
+				4CBFFE671854B15E0005ECA9 /* RLOUnbundler.h */,
+				4CBFFE681854B15E0005ECA9 /* RLOUnbundler.m */,
+				4CBFFE691854B15E0005ECA9 /* RLOUtils.h */,
+				4CBFFE6A1854B15E0005ECA9 /* RLOUtils.m */,
+			);
+			name = RLOClasses;
+			path = ../../RLOClasses;
+			sourceTree = "<group>";
+		};
+		4CBFFEBA1854B3260005ECA9 /* RLORebuildCode */ = {
+			isa = PBXGroup;
+			children = (
+				4CBFFEBB1854B3260005ECA9 /* RLORebuildCode.m */,
+			);
+			path = RLORebuildCode;
+			sourceTree = "<group>";
+		};
 		4CF0AD3D1853DB7D003AEA7A = {
 			isa = PBXGroup;
 			children = (
+				4CBFFEBA1854B3260005ECA9 /* RLORebuildCode */,
+				4CBFFE631854B15E0005ECA9 /* RLOClasses */,
 				4CF0AD4F1853DB7D003AEA7A /* DrawExample */,
 				4CF0AD6D1853DB7D003AEA7A /* DrawExampleTests */,
+				4CBFFE4C1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample */,
 				4CF0AD481853DB7D003AEA7A /* Frameworks */,
 				4CF0AD471853DB7D003AEA7A /* Products */,
 			);
@@ -91,6 +168,7 @@
 			children = (
 				4CF0AD461853DB7D003AEA7A /* DrawExample.app */,
 				4CF0AD671853DB7D003AEA7A /* DrawExampleTests.xctest */,
+				4CBFFE4A1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -162,17 +240,39 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4CF0AD451853DB7D003AEA7A /* DrawExample */ = {
+		4CBFFE491854AFA90005ECA9 /* RLOUpdaterBundleDrawExample */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4CF0AD771853DB7D003AEA7A /* Build configuration list for PBXNativeTarget "DrawExample" */;
+			buildConfigurationList = 4CBFFE591854AFA90005ECA9 /* Build configuration list for PBXNativeTarget "RLOUpdaterBundleDrawExample" */;
 			buildPhases = (
-				4CF0AD421853DB7D003AEA7A /* Sources */,
-				4CF0AD431853DB7D003AEA7A /* Frameworks */,
-				4CF0AD441853DB7D003AEA7A /* Resources */,
+				4CBFFE5A1854B0130005ECA9 /* rlo_onbuildstart */,
+				4CBFFE461854AFA90005ECA9 /* Sources */,
+				4CBFFE471854AFA90005ECA9 /* Frameworks */,
+				4CBFFE481854AFA90005ECA9 /* Resources */,
+				4CBFFE5B1854B0430005ECA9 /* rlo_onbuildend */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+			);
+			name = RLOUpdaterBundleDrawExample;
+			productName = RLOUpdaterBundleDrawExample;
+			productReference = 4CBFFE4A1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4CF0AD451853DB7D003AEA7A /* DrawExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CF0AD771853DB7D003AEA7A /* Build configuration list for PBXNativeTarget "DrawExample" */;
+			buildPhases = (
+				4CBFFE5C1854B07A0005ECA9 /* rlo_onbuildstart */,
+				4CF0AD421853DB7D003AEA7A /* Sources */,
+				4CF0AD431853DB7D003AEA7A /* Frameworks */,
+				4CF0AD441853DB7D003AEA7A /* Resources */,
+				4CBFFE5D1854B08C0005ECA9 /* rlo_onbuildend */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4CBFFE5F1854B0B50005ECA9 /* PBXTargetDependency */,
 			);
 			name = DrawExample;
 			productName = DrawExample;
@@ -206,6 +306,9 @@
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Michael Krause";
 				TargetAttributes = {
+					4CBFFE491854AFA90005ECA9 = {
+						TestTargetID = 4CF0AD451853DB7D003AEA7A;
+					};
 					4CF0AD661853DB7D003AEA7A = {
 						TestTargetID = 4CF0AD451853DB7D003AEA7A;
 					};
@@ -226,11 +329,20 @@
 			targets = (
 				4CF0AD451853DB7D003AEA7A /* DrawExample */,
 				4CF0AD661853DB7D003AEA7A /* DrawExampleTests */,
+				4CBFFE491854AFA90005ECA9 /* RLOUpdaterBundleDrawExample */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		4CBFFE481854AFA90005ECA9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4CBFFE511854AFA90005ECA9 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4CF0AD441853DB7D003AEA7A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -252,14 +364,84 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		4CBFFE5A1854B0130005ECA9 /* rlo_onbuildstart */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = rlo_onbuildstart;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec ${SRCROOT}/../../scripts/rlo_onbuildstart.sh RLOUpdaterBundle${TARGET_NAME}.xctest";
+		};
+		4CBFFE5B1854B0430005ECA9 /* rlo_onbuildend */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = rlo_onbuildend;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec ${SRCROOT}/../../scripts/rlo_onbuildend.sh";
+		};
+		4CBFFE5C1854B07A0005ECA9 /* rlo_onbuildstart */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = rlo_onbuildstart;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec ${SRCROOT}/../../scripts/rlo_onbuildstart.sh RLOUpdaterBundle${TARGET_NAME}.xctest";
+		};
+		4CBFFE5D1854B08C0005ECA9 /* rlo_onbuildend */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = rlo_onbuildend;
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "exec ${SRCROOT}/../../scripts/rlo_onbuildend.sh";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		4CBFFE461854AFA90005ECA9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4CBFFEBC1854B3260005ECA9 /* RLORebuildCode.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		4CF0AD421853DB7D003AEA7A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				4CF0AD5D1853DB7D003AEA7A /* AppDelegate.m in Sources */,
+				4CBFFE6B1854B15E0005ECA9 /* RLOBundleUpdater.m in Sources */,
+				4CBFFE6C1854B15E0005ECA9 /* RLOUnbundler.m in Sources */,
 				4CF0AD561853DB7D003AEA7A /* main.m in Sources */,
 				4CBFFE3A1854A8270005ECA9 /* DrawView.m in Sources */,
+				4CBFFE6D1854B15E0005ECA9 /* RLOUtils.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,6 +456,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4CBFFE5F1854B0B50005ECA9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4CBFFE491854AFA90005ECA9 /* RLOUpdaterBundleDrawExample */;
+			targetProxy = 4CBFFE5E1854B0B50005ECA9 /* PBXContainerItemProxy */;
+		};
 		4CF0AD6C1853DB7D003AEA7A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 4CF0AD451853DB7D003AEA7A /* DrawExample */;
@@ -282,6 +469,14 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
+		4CBFFE4F1854AFA90005ECA9 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				4CBFFE501854AFA90005ECA9 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		4CF0AD521853DB7D003AEA7A /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -317,6 +512,48 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		4CBFFE571854AFA90005ECA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/DrawExample.app/Contents/MacOS/DrawExample";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RLOUpdaterBundleDrawExample/RLOUpdaterBundleDrawExample-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "RLOUpdaterBundleDrawExample/RLOUpdaterBundleDrawExample-Info.plist";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		4CBFFE581854AFA90005ECA9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/DrawExample.app/Contents/MacOS/DrawExample";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "RLOUpdaterBundleDrawExample/RLOUpdaterBundleDrawExample-Prefix.pch";
+				INFOPLIST_FILE = "RLOUpdaterBundleDrawExample/RLOUpdaterBundleDrawExample-Info.plist";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		4CF0AD751853DB7D003AEA7A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -454,6 +691,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4CBFFE591854AFA90005ECA9 /* Build configuration list for PBXNativeTarget "RLOUpdaterBundleDrawExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CBFFE571854AFA90005ECA9 /* Debug */,
+				4CBFFE581854AFA90005ECA9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		4CF0AD411853DB7D003AEA7A /* Build configuration list for PBXProject "DrawExample" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
