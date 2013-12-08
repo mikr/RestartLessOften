@@ -98,6 +98,32 @@ GLfloat gCubeVertexData[216] =
 
 @implementation ViewController
 
+- (NSString *)mainBundlePathForResource:(NSString *)name ofType:(NSString *)ext
+{
+#ifdef RLO_ENABLED
+    NSString *resourcename = [name stringByAppendingPathExtension:ext];
+    if (changedFiles[resourcename]) {
+        return [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject] stringByAppendingPathComponent:resourcename];
+    }
+#endif
+    return [[NSBundle mainBundle] pathForResource:name ofType:ext];
+}
+
+#ifdef RLO_ENABLED
+
+NSMutableDictionary *changedFiles;
+BOOL shadersChanged;
+
+- (void)destroyShaders
+{
+    if (_program) {
+        glDeleteProgram(_program);
+        _program = 0;
+    }
+}
+
+#endif
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -113,6 +139,7 @@ GLfloat gCubeVertexData[216] =
     view.drawableDepthFormat = GLKViewDrawableDepthFormat24;
     
     [self setupGL];
+    RLOaddObserver(self, @selector(rloNotification:));
 }
 
 - (void)dealloc
@@ -122,6 +149,8 @@ GLfloat gCubeVertexData[216] =
     if ([EAGLContext currentContext] == self.context) {
         [EAGLContext setCurrentContext:nil];
     }
+    
+    RLOremoveObserver(self);
 }
 
 - (void)didReceiveMemoryWarning
@@ -204,7 +233,8 @@ GLfloat gCubeVertexData[216] =
     self.effect.transform.modelviewMatrix = modelViewMatrix;
     
     // Compute the model view matrix for the object rendered with ES2
-    modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f);
+    // Without RLO_ENABLED, the third parameter results in 1.5f + 0.0 which is optimized as a constant (at least any optimization enabled).
+    modelViewMatrix = GLKMatrix4MakeTranslation(0.0f, 0.0f, 1.5f + RLOGetFloat(@"ztranslation", 0.0));
     modelViewMatrix = GLKMatrix4Rotate(modelViewMatrix, _rotation, 1.0f, 1.0f, 1.0f);
     modelViewMatrix = GLKMatrix4Multiply(baseModelViewMatrix, modelViewMatrix);
     
@@ -217,15 +247,31 @@ GLfloat gCubeVertexData[216] =
 
 - (void)glkView:(GLKView *)view drawInRect:(CGRect)rect
 {
-    glClearColor(0.65f, 0.65f, 0.65f, 1.0f);
+#ifdef RLO_ENABLED
+    if (shadersChanged) {
+        shadersChanged = NO;
+        [self destroyShaders];
+        [self loadShaders];
+    }
+#endif
+    float r = 0.65f, g = 0.65f, b = 0.65f, a = 1.0f;
+    NSString *backgroundcolor = RLOGetObject(@"backgroundcolor");
+    if (backgroundcolor) {
+        SKScanHexColor(backgroundcolor, &r, &g, &b, &a);
+    }
+    glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     glBindVertexArrayOES(_vertexArray);
     
     // Render the object with GLKit
     [self.effect prepareToDraw];
-    
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    if (! RLOGetInt(@"disable_glkitcube", 0)) {
+        unsigned int default_num_triangles = 36;
+        unsigned int num_triangles = RLOGetInt(@"num_triangles", default_num_triangles);
+        glDrawArrays(GL_TRIANGLES, 0, MIN(num_triangles, default_num_triangles));
+    }
     
     // Render the object again with ES2
     glUseProgram(_program);
@@ -247,14 +293,14 @@ GLfloat gCubeVertexData[216] =
     _program = glCreateProgram();
     
     // Create and compile vertex shader.
-    vertShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"vsh"];
+    vertShaderPathname = [self mainBundlePathForResource:@"Shader" ofType:@"vsh"];
     if (![self compileShader:&vertShader type:GL_VERTEX_SHADER file:vertShaderPathname]) {
         NSLog(@"Failed to compile vertex shader");
         return NO;
     }
     
     // Create and compile fragment shader.
-    fragShaderPathname = [[NSBundle mainBundle] pathForResource:@"Shader" ofType:@"fsh"];
+    fragShaderPathname = [self mainBundlePathForResource:@"Shader" ofType:@"fsh"];
     if (![self compileShader:&fragShader type:GL_FRAGMENT_SHADER file:fragShaderPathname]) {
         NSLog(@"Failed to compile fragment shader");
         return NO;
@@ -387,5 +433,68 @@ GLfloat gCubeVertexData[216] =
     
     return YES;
 }
+
+#pragma mark -
+
+// From https://github.com/davedelong/StackKit/blob/master/Classes/SKFunctions.m
+
+void SKScanHexColor(NSString * hexString, float * red, float * green, float * blue, float * alpha) {
+	NSString *cleanString = [hexString stringByReplacingOccurrencesOfString:@"#" withString:@""];
+	if([cleanString length] == 3) {
+		cleanString = [NSString stringWithFormat:@"%@%@%@%@%@%@",
+					   [cleanString substringWithRange:NSMakeRange(0, 1)],[cleanString substringWithRange:NSMakeRange(0, 1)],
+					   [cleanString substringWithRange:NSMakeRange(1, 1)],[cleanString substringWithRange:NSMakeRange(1, 1)],
+					   [cleanString substringWithRange:NSMakeRange(2, 1)],[cleanString substringWithRange:NSMakeRange(2, 1)]];
+	}
+	if([cleanString length] == 6) {
+		cleanString = [cleanString stringByAppendingString:@"ff"];
+	}
+    
+	unsigned int baseValue;
+	[[NSScanner scannerWithString:cleanString] scanHexInt:&baseValue];
+    
+	if (red) { *red = ((baseValue >> 24) & 0xFF)/255.0f; }
+	if (green) { *green = ((baseValue >> 16) & 0xFF)/255.0f; }
+	if (blue) { *blue = ((baseValue >> 8) & 0xFF)/255.0f; }
+	if (alpha) { *alpha = ((baseValue >> 0) & 0xFF)/255.0f; }
+}
+
+#pragma mark -
+
+#ifdef RLO_ENABLED
+
+- (void)rloNotification:(NSNotification *)aNotification
+{
+    NSLog(@"rloNotification: %@", aNotification);
+    self.paused = NO;
+
+    NSString *changedfilename = RLO_CHANGED_FILE(aNotification);
+    if (changedfilename) {
+        NSData *data = RLO_DOWNLOAD_DATA(changedfilename);
+        if (data) {
+            NSString *cachedir = [NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) lastObject];
+            [data writeToFile:[cachedir stringByAppendingPathComponent:changedfilename] atomically:YES];
+            if (! changedFiles) {
+                changedFiles = [[NSMutableDictionary alloc] init];
+            }
+            changedFiles[changedfilename] = data;
+            if ([@[@"vsh", @"fsh"] containsObject:[changedfilename pathExtension]]) {
+                shadersChanged = YES;
+            }
+        }
+    }
+    
+    // By storing variables in the global RLO dictionary, parameter tweaks can be
+    // added with introducing new instance variables.
+    if (RLONotificationHasKeyCombo(aNotification, @"F")) {
+        RLOSetFloat(@"ztranslation", RLOGetFloat(@"ztranslation", 0.0) + 0.1);
+    } else if (RLONotificationHasKeyCombo(aNotification, @"Shift-F")) {
+        RLOSetFloat(@"ztranslation", RLOGetFloat(@"ztranslation", 0.0) - 0.1);
+    }
+
+    [self.view setNeedsDisplay];
+}
+
+#endif
 
 @end
