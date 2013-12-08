@@ -1,4 +1,133 @@
-RestartLessOften
-================
+# RestartLessOften
 
-modify parameters, colors, images and code of your app without restart on iOS and OS X with Objective-C
+When programming an iOS or OS X application in Objective-C almost every minor parameter or code change requires a recompilation of the changed sources followed by an application restart to see the change.
+
+This project offers some tools to reduce the number of restarts when adjusting numbers, strings, colors, images, OpenGL shaders, xib files and so forth even code changes can be done with limitations.
+
+To enable your code to use RestartLessOften you have to include some source files into your Xcode project and create a configuration file for your app which you can modify at runtime to feed parameter changes into your app.
+
+## QuickStart
+
+First start `rlo_server.py` in a Terminal window. RestartLessOften comes with two preconfigured examples, one for iOS another for OS X that should just build and run.
+When you make changes in `rloconfig.py` and save the file, the app should react to the changed parameter, try this with `backgroundcolor` in `GLExample/rloconfig.py`.
+In GLExample at the end of `ViewController.m` you see `self.paused = NO;`. Change this into a YES and just build the app without restarting. The animation should stop immediately because a new version of `ViewController.m` was patched into the running code.
+
+If you get this running you can try to run GLExample on an iOS device which should also work but this is usually more likely to fail. Change `self.paused` several times between YES and NO and build and see if it works for you.
+
+DrawExample is a simple Cocoa app with a `-drawRect:` method in `DrawView.m` that you can modify as well at runtime. Try commenting out some drawing code and just build.
+
+`InstallingRLO.md` explaines all steps necessary to add RestartLessOften into an existing app. There are quite some steps and if you follow everything correctly the code updates still might not work.
+`RefactoringForRLO.md` explains how to restructure your code to make better use of RLO.
+
+## The Client-Server Architecture
+
+RestartLessOften tries to be minimally invasive. Because embedding an HTTP server in an app is way more complicated than emitting HTTP requests your Mac is the server-side and your app is the client.
+Your app downloads the configuration file as a plist and updates the global dictionary with the current parameter values. Immediately afterwards it starts the next request but the server is blocking the request until some parameter has changed.
+
+## Your main.m
+
+You probably know that before `applicationDidFinishLaunching:` is called a lot of your code has already run.
+To give all of your code a chance to run with the current `rloconfig.py` the first download is synchronous on the main-thread, all following requests are on a background thread.
+ 
+## The configuration file
+
+The Python script `rloconfig.py` contains your configuration script which actually doesn't contain much code just data with the standard data types int, float, string, array, dict and Data.
+Here is an excerpt of a `rloconfig.py` where you can see some nested dictionaries.
+
+
+```python
+def rloconfiguration():
+    T = dict(
+              rlo = dict(
+                  log_http_requests = 0,
+                  generate_urls = 0,
+                  generate_urls_if_num_diffs_less_than = 10,
+                  show_nondefault_vars = 1,   # 1: show diff once, 2: show diff every time
+                  show_config_diffs = 1,
+                  show_config_diffs_if_num_diffs_less_than = 10,
+                  persistent_updates = 0,
+                  serverfilecache = 1,
+                  use_bundle_load = 0,
+                  supress_warning = 0,
+                  delete_screenshots = 1,
+                  # Directories are either absolute or relative to this directory of this rloconfig.py file.
+                  testdata_directories = [
+                      "GLExample/Shaders"
+                      ],
+              ),
+              watch_files = ['*.vsh', '*.fsh'],
+              # watch_xibfiles = [],
+              # ignore_files = [],
+
+              # ---------------- Only app specific variables below this point ----
+
+              backgroundcolor = "#A5A5A5FF",
+              disable_glkitcube = 0,
+              num_triangles = 36,
+    )
+    return T
+```
+
+The `rlo` section is used by `rlo_server.py` and the RLO code inside your app. Some other variables `watch_files`, `watch_xibfiles`,  `ignore_files` are also used by `rlo_server.py` to see if resources of your app have changed.
+
+## The RLO Server
+
+You start one `rlo_server.py` on your Mac which accepts and handles requests from several different apps at once, each request tells the server to which app and `rloconfig.py` it belongs.
+
+## RLO_ENABLED
+
+RestartLessOften only uses `#ifdef RLO_ENABLED` to include RLO code into your app. If you use `#if DEBUG` or something else is your choice but please make sure that you never distribute an application where `RLO_ENABLED` was still defined. It would send requests to a host with your local hostname on the network of your users which would be embarrassing for you and me.  
+On the upside if you get this one right you never have to remove RLO code from your app before building the distribution binary.
+
+Another goal of RestartLessOften is that if `RLO_ENABLED` is undefined no code at all should be included that is only needed by RLO and not the app itself. See `Classes without -dealloc` for an example.
+
+# Classes without `-dealloc`
+
+If `RLOremoveObserver(self)` would be the only thing in your `-dealloc` method, an empty `-dealloc` would still remain when `RLO_ENABLED` is not defined. 
+To remove `-dealloc` for a clean distribution build you use this:
+```objective-c
+#ifdef RLO_ENABLED
+- (void)dealloc
+{
+    RLOremoveObserver(self);
+}
+#endif
+```
+But make sure to remove the `#ifdef RLO_ENABLED` if any other code gets added to the `-dealloc` of this class.
+
+# Keyboard support
+
+RestartLessOften supports sending key events from the Mac keyboard into the iOS Simulator. This makes use of undocumented APIs and is likely to break with a minor update of the iOS Simulator. If you really want to send key events into your app that is running on the device, you can start build and run RLOApp and keep it in the foreground. Key events are send from `RLOApp` via the RLO server to your app. See `GLExample/Viewcontroller.m` how to handle key events. This method of forwarding key events is also a bit brittle but may be useful nonetheless.
+
+# Enabling C++ sources
+
+If you want code updates in Objective-C++ files, make a copy of RLORebuildCode.m named RLORebuildCode.mm and add it to the Xcode project only for the target RLOUpdaterBundleGLExample. The script `rlo_newerfiles.py` generates imports for Objective-C++ files into RLORebuildCode.mm. The need for this distinction is that the default include paths for Objective-C and Objective-C++ are different and this is handled by having these two files.
+
+## Known Problems
+
+* auto-synthesized properties
+	-	I have had problems updating code in classes with auto-synthesized properties, which resulted in the new code having a different class layout.
+Manually adding the synthesize `@synthesize theproperty=_theproperty;` fixed these kind of problems.
+* class layout changes
+	* when adding, removing or renaming an instance variable or property a code update requires a restart of the app.
+
+## Security
+
+The RLO server should only deliver files that are listed in the `testdata_directories` and below but RLO does not contain security measures to run safely between your app and the server on a hostile network.
+
+## Documentation
+
+There is a lot more documentation to be written about this project but first I wanted to get it out there to see if at least the preconfigured examples run for most users. Feedback is welcome.
+
+## Credits
+
+RestartLessOften was written by [Michael Krause](http://krause-software.com).
+
+John Holdsworth must be credited for creating Injection for Xcode https://github.com/johnno1962/injectionforxcode
+from where I picked up the code update technique via bundles. You should definitely try out this his tool which is much easier to set up than RestartLessOften and may be more suitable for you.
+
+The Dynamic code injection Tool https://github.com/DyCI/dyci-main helped a lot in requiring less manual modifications of the users source code to enable code updates.
+
+## License
+
+RestartLessOften is available under the MIT license. See the LICENSE file for more info.

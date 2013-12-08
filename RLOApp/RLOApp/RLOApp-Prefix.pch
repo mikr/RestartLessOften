@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the 'RLOApp' target in the 'RLOApp' project
+//
+
+#ifdef __OBJC__
+    #define RLO_ENABLED
+    #import <Cocoa/Cocoa.h>
+#endif
