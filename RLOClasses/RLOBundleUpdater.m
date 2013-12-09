@@ -373,10 +373,10 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
 
 + (void)notifyRLOConfigurationChangeOnMainThread:(NSDictionary *)aUserInfo
 {
-    [[self class] performSelectorOnMainThread:@selector(notifyTestConfigurationChange:) withObject:aUserInfo waitUntilDone:NO];
+    [[self class] performSelectorOnMainThread:@selector(notifyRLOConfigurationChange:) withObject:aUserInfo waitUntilDone:NO];
 }
 
-+ (void)notifyTestConfigurationChange:(NSDictionary *)aUserInfo
++ (void)notifyRLOConfigurationChange:(NSDictionary *)aUserInfo
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:RLOTIfiNotification object:[self class] userInfo:aUserInfo];
 }

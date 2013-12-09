@@ -16,7 +16,7 @@ int main(int argc, const char * argv[])
     @autoreleasepool {
 #ifdef RLO_ENABLED
         RLOStartChecking;
-        RLO_INIT_CONFIGURATION(RLO_TESTCONF_PATH, RLO_SERVERURL);
+        RLO_INIT_CONFIGURATION(RLO_CONFIG_PATH, RLO_SERVERURL);
         RLO_LOAD_CONFIGURATION(nil);
         RLO_START_CONF_LOADER;
 #endif

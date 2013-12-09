@@ -26,8 +26,8 @@
 #define RLOLog NSLog
 #define RLOLogf NSLog
 
-#define TESTVAR_HTTP_SERVER @"_rloutils_http_server"
-#define TESTVAR_RLOCONF_FILENAME @"_rloutils_rloconf_filename"
+#define RLOVAR_HTTP_SERVER @"_rloutils_http_server"
+#define RLOVAR_RLOCONF_FILENAME @"_rloutils_rloconf_filename"
 
 #define RLOCONFIG_FILENAME @"rloconfig.plist"
 #define CHANGED_FILE_KEY @"changed_file"
@@ -36,9 +36,9 @@
 
 #define logNonDefaultVar(s, ...) NSLog(DebugDecorateM(s), ##__VA_ARGS__)
 
-#define TESTCONF_LOADER_SUCCEEDED 0
-#define TESTCONF_LOADED_INVALID 1
-#define TESTCONF_LOADED_ERROR 2
+#define RLOCONF_LOADER_SUCCEEDED 0
+#define RLOCONF_LOADED_INVALID 1
+#define RLOCONF_LOADED_ERROR 2
 
 #define RLO_VARTYPE_INTEGER 1
 #define RLO_VARTYPE_FLOAT 2
@@ -60,6 +60,8 @@ static inline void RLOPrint(NSString *format, ...)
 
 
 static NSTimeInterval starttime = 0;
+static unsigned int rlo_config_download_request_nr = 0;
+static NSMutableDictionary *rlo_reported_failed_downloads;
 
 NSMutableDictionary *rlo_vars_dict;
 NSDictionary *rlo_vars_lastdiff_dict;
@@ -418,7 +420,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 + (NSString *)projectname
 {
     NSString *project_name = @"unknownproject";
-    NSString *rloconf_filename = RLOGetObject(TESTVAR_RLOCONF_FILENAME);
+    NSString *rloconf_filename = RLOGetObject(RLOVAR_RLOCONF_FILENAME);
     if (! rloconf_filename) {
         return project_name;
     }
@@ -439,11 +441,11 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 
 + (NSString *)requestURLForDownload:(NSString *)filename
 {
-    NSString *http_server = RLOGetObject(TESTVAR_HTTP_SERVER);
+    NSString *http_server = RLOGetObject(RLOVAR_HTTP_SERVER);
     if (! http_server) {
         return nil;
     }
-    NSString *rloconf_filename = RLOGetObject(TESTVAR_RLOCONF_FILENAME);
+    NSString *rloconf_filename = RLOGetObject(RLOVAR_RLOCONF_FILENAME);
     if (! rloconf_filename) {
         return nil;
     }
@@ -477,7 +479,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 {
     BOOL success;
     if (RLOGetInt(@"rlo.hostname_resolution", 0)) {
-        NSString *serverurl = RLOGetObject(TESTVAR_HTTP_SERVER);
+        NSString *serverurl = RLOGetObject(RLOVAR_HTTP_SERVER);
         NSURL *url = [NSURL URLWithString:serverurl];
         NSString *hostname = [url host];
         
@@ -495,7 +497,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
                     success = [self downloadFileFromURL:testurl filename:filename data:data response:response];
                     if (success) {
                         NSString *newserverurl = [self urlWithReplacedHostname:url hostname:ip];
-                        RLOSetObject(TESTVAR_HTTP_SERVER, newserverurl);
+                        RLOSetObject(RLOVAR_HTTP_SERVER, newserverurl);
                         return success;
                     }
                 }
@@ -515,17 +517,39 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     [request setHTTPMethod: @"GET"];
     [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
     NSData *responsedata = [NSURLConnection sendSynchronousRequest:request returningResponse:response error:&error];
+    NSArray *components = [filename componentsSeparatedByString:@"&"];
+    NSString *name = components.count > 0 ? components[0] : nil;
+    
+    if (! rlo_reported_failed_downloads) {
+        rlo_reported_failed_downloads = [[NSMutableDictionary alloc] init];
+    }
     if (error) {
-        RLOLog(@"Error downloading file %@ from %@: %@", filename, theUrl, error);
         *data = nil;
+        if (name) {
+            if (rlo_reported_failed_downloads[name]) {
+                return NO;
+            }
+            rlo_reported_failed_downloads[name] = @(YES);
+        }
+        RLOLogRED(@"Error downloading file %@ from %@: %@", filename, theUrl, [error localizedDescription]);
         return NO;
     }
     if ((([*response statusCode] / 100) == 2) && [responsedata length] > 0) {
         *data = responsedata;
+        if (name) {
+            // After a successful download if the next download of this file fails it will be logged.
+            [rlo_reported_failed_downloads removeObjectForKey:name];
+        }
         return YES;
     }
-    RLOLog(@"Error downloading file '%@' from '%@': %@", filename, theUrl, [[NSString alloc] initWithData:responsedata encoding:NSUTF8StringEncoding]);
     *data = nil;
+    if (name) {
+        if (rlo_reported_failed_downloads[name]) {
+            return NO;
+        }
+        rlo_reported_failed_downloads[name] = @(YES);
+    }
+    RLOLogRED(@"Error: Server response for downloading file '%@' from '%@': (%ld) %@", filename, theUrl, (long)[*response statusCode], [[NSString alloc] initWithData:responsedata encoding:NSUTF8StringEncoding]);
     return NO;
 }
 
@@ -560,12 +584,12 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 {
     NSHTTPURLResponse *response;
     NSError *error = nil;
-    NSString *http_server = RLOGetObject(TESTVAR_HTTP_SERVER);
+    NSString *http_server = RLOGetObject(RLOVAR_HTTP_SERVER);
     if (! http_server) {
-        RLOLogRED(@"Warning: TESTVAR_HTTP_SERVER is not set");
+        RLOLogRED(@"Warning: RLOVAR_HTTP_SERVER is not set");
         return NO;
     }
-    NSString *rloconf_filename = RLOGetObject(TESTVAR_RLOCONF_FILENAME);
+    NSString *rloconf_filename = RLOGetObject(RLOVAR_RLOCONF_FILENAME);
     if (! rloconf_filename) {
         return NO;
     }
@@ -609,12 +633,12 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
         RLOLog(@"Error in uploadData, filename is nil");
         return NO;
     }
-    NSString *http_server = RLOGetObject(TESTVAR_HTTP_SERVER);
+    NSString *http_server = RLOGetObject(RLOVAR_HTTP_SERVER);
     if (! http_server) {
-        RLOLogRED(@"Warning: Trying to upload '%@' (%lu bytes) but TESTVAR_HTTP_SERVER is not set", filename, (unsigned long)data.length);
+        RLOLogRED(@"Warning: Trying to upload '%@' (%lu bytes) but RLOVAR_HTTP_SERVER is not set", filename, (unsigned long)data.length);
         return NO;
     }
-    NSString *rloconf_filename = RLOGetObject(TESTVAR_RLOCONF_FILENAME);
+    NSString *rloconf_filename = RLOGetObject(RLOVAR_RLOCONF_FILENAME);
     if (! rloconf_filename) {
         return NO;
     }
@@ -708,13 +732,13 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     return sorted_addresses;
 }
 
-+ (void)initTestConfiguration:(NSString *)path serverURL:(NSString *)theServerURL
++ (void)initRLOConfiguration:(NSString *)path serverURL:(NSString *)theServerURL
 {
-    RLOSetObject(TESTVAR_RLOCONF_FILENAME, [path stringByStandardizingPath]);
-    RLOSetObject(TESTVAR_HTTP_SERVER, theServerURL);
+    RLOSetObject(RLOVAR_RLOCONF_FILENAME, [path stringByStandardizingPath]);
+    RLOSetObject(RLOVAR_HTTP_SERVER, theServerURL);
 }
 
-+ (int)loadTestConfiguration:(NSString *)client_id blocking:(BOOL)blocking
++ (int)loadRLOConfiguration:(NSString *)client_id blocking:(BOOL)blocking
 {
     NSData *data = nil;
     NSString *blocking_param = blocking ? @"&blocking=1" : @"";
@@ -737,6 +761,13 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     } else {
         NSHTTPURLResponse *response;
         succeeded = [[self class] downloadFile:[NSString stringWithFormat:@"%@&starttime=%@%@", RLOCONFIG_FILENAME, client_id, blocking_param] data:&data response:&response];
+        if (! succeeded && rlo_config_download_request_nr == 0) {
+            RLOLog(@"The rlo_server.py is not running so you cannot see parameters changes in rloconfig.py in the app.");
+            RLOLog(@"But if you are content with only doing code updates without restart that is perfectly fine for OS X and the simulator without a running RLO server.");
+            RLOLog(@"Code updates during runtime on an iOS device on the other hand require a running RLO server.");
+        }
+        rlo_config_download_request_nr++;
+        
         NSDictionary *all_headers = [response allHeaderFields];
         NSString *filename = [all_headers objectForKey:@"Filename"];
         
@@ -745,7 +776,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
             if ([handler isKindOfClass:[NSObject class]] && [handler respondsToSelector:@selector(handleRLOServerResponse:data:succeeded:)]) {
                 BOOL handled = [handler handleRLOServerResponse:response data:data succeeded:succeeded];
                 if (handled) {
-                    return TESTCONF_LOADER_SUCCEEDED;
+                    return RLOCONF_LOADER_SUCCEEDED;
                 }
             }
         }
@@ -753,8 +784,8 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
         if (filename && ![filename isEqualToString:RLOCONFIG_FILENAME]) {
             [self setFilecontent:filename value:data];
             RLOLogGREEN(@"File '%@' was replaced", filename);
-            [[self class] performSelectorOnMainThread:@selector(notifyTestConfigurationChange:) withObject:@{CHANGED_FILE_KEY:filename} waitUntilDone:NO];
-            return TESTCONF_LOADER_SUCCEEDED;
+            [[self class] performSelectorOnMainThread:@selector(notifyRLOConfigurationChange:) withObject:@{CHANGED_FILE_KEY:filename} waitUntilDone:NO];
+            return RLOCONF_LOADER_SUCCEEDED;
         }
     }
     
@@ -766,7 +797,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
                                                               format:&format
                                                                error:&error];
         if (error || ! [plist isKindOfClass:[NSDictionary class]]) {
-            return TESTCONF_LOADED_INVALID;
+            return RLOCONF_LOADED_INVALID;
         }
         NSDictionary *dict_a = [rlo_vars_dict copy];
         [self addEntriesToDebugDict:plist];
@@ -784,11 +815,11 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
         }
         rlo_vars_lastdiff_dict = diff;
         [[self class] updateGlobalVariables];
-        [[self class] performSelectorOnMainThread:@selector(notifyTestConfigurationChange:) withObject:nil waitUntilDone:NO];
+        [[self class] performSelectorOnMainThread:@selector(notifyRLOConfigurationChange:) withObject:nil waitUntilDone:NO];
         // almost immediately continue with the next blocking request
-        return TESTCONF_LOADER_SUCCEEDED;
+        return RLOCONF_LOADER_SUCCEEDED;
     } else {
-        return TESTCONF_LOADED_ERROR;
+        return RLOCONF_LOADED_ERROR;
     }
 }
 
@@ -821,7 +852,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     rlo_vars_lastdiff_dict = @{};
 }
 
-+ (void)notifyTestConfigurationChange:(NSDictionary *)aUserInfo
++ (void)notifyRLOConfigurationChange:(NSDictionary *)aUserInfo
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:RLOTIfiNotification object:[self class] userInfo:aUserInfo];
 }
@@ -868,7 +899,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
                 case 1: RLOPrint(@"URL: %@", url); break;
 #endif
                 case 2: RLOPrint(@"%@", url); break;
-                default: RLOPrint(@"%@/%@", RLOGetObject(TESTVAR_HTTP_SERVER), pathargs); break;
+                default: RLOPrint(@"%@/%@", RLOGetObject(RLOVAR_HTTP_SERVER), pathargs); break;
                     break;
             }
             printf("=======================================================================\n");
@@ -885,9 +916,9 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     }
 }
 
-+ (int)loadTestConfiguration:(NSString *)client_id
++ (int)loadRLOConfiguration:(NSString *)client_id
 {
-    return [[self class] loadTestConfiguration:client_id blocking:NO];
+    return [[self class] loadRLOConfiguration:client_id blocking:NO];
 }
 
 + (void)confLoader:(id)arg
@@ -896,15 +927,15 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     while (1) {
         @autoreleasepool {
             if (! ready ) {
-                RLOLogf(@"TestConfLoader started");
+                RLOLogf(@"RLOConfigLoader started");
                 ready = YES;
             }
-            int status = [[self class] loadTestConfiguration:nil blocking:YES];
-            if (status == TESTCONF_LOADED_INVALID) {
+            int status = [[self class] loadRLOConfiguration:nil blocking:YES];
+            if (status == RLOCONF_LOADED_INVALID) {
                 continue;
-            } else if (status == TESTCONF_LOADER_SUCCEEDED) {
+            } else if (status == RLOCONF_LOADER_SUCCEEDED) {
                 [NSThread sleepForTimeInterval:0];
-            } else if (status == TESTCONF_LOADED_ERROR) {
+            } else if (status == RLOCONF_LOADED_ERROR) {
                 [NSThread sleepForTimeInterval:1];
             }
             

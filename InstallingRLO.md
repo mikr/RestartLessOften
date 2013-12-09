@@ -42,7 +42,7 @@ Add this checked import
 #if DEBUG
 #define RLO_ENABLED
 #import "RLODefinitions.h"
-#define RLO_TESTCONF_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
+#define RLO_CONFIG_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
 #endif
 ```
 to GLExample-Prefix.pch at the end of the `#ifdef __OBJC__` block.
@@ -58,7 +58,7 @@ to `main.m` as well as the startup code
 ```objective.c
 #ifdef RLO_ENABLED
         RLOStartChecking;
-        RLO_INIT_CONFIGURATION(RLO_TESTCONF_PATH, RLO_SERVERURL);
+        RLO_INIT_CONFIGURATION(RLO_CONFIG_PATH, RLO_SERVERURL);
         RLO_LOAD_CONFIGURATION(nil);
         RLO_START_CONF_LOADER;
 #endif

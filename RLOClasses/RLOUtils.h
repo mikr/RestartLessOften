@@ -17,8 +17,8 @@
 
 #define RLO_DOWNLOAD_DATA(name) [RLOUtils downloadFile:(name)]
 #define RLO_START_CONF_LOADER [RLOUtils startConfLoader]
-#define RLO_INIT_CONFIGURATION(path, url) [RLOUtils initTestConfiguration:(path) serverURL:(url)]
-#define RLO_LOAD_CONFIGURATION(x) [RLOUtils loadTestConfiguration:(x)]
+#define RLO_INIT_CONFIGURATION(path, url) [RLOUtils initRLOConfiguration:(path) serverURL:(url)]
+#define RLO_LOAD_CONFIGURATION(x) [RLOUtils loadRLOConfiguration:(x)]
 #define RLO_CHANGED_FILE(notification) [RLOUtils changedFile:(notification)]
 #define RLO_LOAD_OBJECT(name) [RLOUtils loadObject:name]
 #define RLO_SAVE_OBJECT(obj, objname) [RLOUtils saveObject:obj name:objname]
@@ -97,8 +97,8 @@ extern NSMutableDictionary *rlo_vars_dict;
 + (BOOL)uploadData:(NSData *)data filename:(NSString *)filename;
 + (BOOL)takeSimulatorScreenshot:(NSString *)filename;
 
-+ (void)initTestConfiguration:(NSString *)path serverURL:(NSString *)theServerURL;
-+ (int)loadTestConfiguration:(NSString *)client_id;
++ (void)initRLOConfiguration:(NSString *)path serverURL:(NSString *)theServerURL;
++ (int)loadRLOConfiguration:(NSString *)client_id;
 + (void)startConfLoader;
 
 + (id)loadObject:(NSString *)name;
