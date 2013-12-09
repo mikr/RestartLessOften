@@ -894,7 +894,9 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
                 break;
         }
         if ([parameters count] < RLOGetInt(@"rlo.generate_urls_if_num_diffs_less_than", 0)) {
-            NSString *pathargs = [NSString stringWithFormat:@"%@/update?%@", [self projectname], [parameters componentsJoinedByString:@"&"]];
+            NSString *projectname = [self projectname];
+            NSString *paramlist = [parameters componentsJoinedByString:@"&"];
+            NSString *pathargs = [NSString stringWithFormat:@"%@/update?%@", projectname, paramlist];
             NSString *url = [NSString stringWithFormat:@"%@://%@", protocol, pathargs];
             printf("=======================================================================\n");
             switch (generate_urls) {
@@ -904,7 +906,9 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
                 case 1: RLOPrint(@"URL: %@", url); break;
 #endif
                 case 2: RLOPrint(@"%@", url); break;
-                default: RLOPrint(@"%@/%@", RLOGetObject(RLOVAR_HTTP_SERVER), pathargs); break;
+                default:
+                    RLOPrint(@"%@/%@", RLOGetObject(RLOVAR_HTTP_SERVER),
+                             [NSString stringWithFormat:@"update/%@?%@", projectname, paramlist]);
                     break;
             }
             printf("=======================================================================\n");

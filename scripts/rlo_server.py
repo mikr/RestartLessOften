@@ -654,9 +654,15 @@ def update_variable(environ, start_response):
     global updated_variables
     global updated_variables_changed
 
-    length = int(environ.get('CONTENT_LENGTH', '0'))
-    data = environ['wsgi.input'].read(length)
-    paramlist = urlparse.parse_qsl(data, keep_blank_values=True)
+    paramstring = ''
+    if environ.get('REQUEST_METHOD') == 'POST':
+        length = int(environ.get('CONTENT_LENGTH') or '0')
+        data = environ['wsgi.input'].read(length)
+        paramstring = data
+    elif environ.get('REQUEST_METHOD') == 'GET':
+        paramstring = environ.get('QUERY_STRING')
+
+    paramlist = urlparse.parse_qsl(paramstring, keep_blank_values=True)
 
     # If we would ever need to restore the WSGI environ uncomment these two lines:
     # body = cStringIO.StringIO(data)
