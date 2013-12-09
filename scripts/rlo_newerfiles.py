@@ -1,4 +1,4 @@
-#!/Users/michael/.virtualenvs/dev27/bin/python
+#!/usr/bin/env python2.7
 # -*- coding: utf-8 -*-
 #
 # Copyright (c) 2010-2013 Michael Krause ( http://krause-software.com/ ). All rights reserved.
@@ -164,12 +164,6 @@ def rebuildcodefilename(projectdir):
     return rcname
 
 def main(argv, options, p):
-    if os.environ.get('PYCHARM_HOSTED'):
-        executable = "/Users/michael/Library/Developer/Xcode/DerivedData/TiltShift-dhgspzqlvyittrcldrdvwzydhbff/Build/Products/Debug-iphoneos/TiltShiftDev.app/TiltShiftDev"
-        projectdir = find_project()
-        find_newerfiles(executable, projectdir)
-        return
-
     if options.projectdir:
         options.projectdir = cleaned_projectdir(options.projectdir)
 
