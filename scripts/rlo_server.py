@@ -91,7 +91,7 @@ request_nr = 0
 
 client_list = {}
 updated_variables = {}
-updated_variables_changed = False
+updated_variables_changed = {}
 updated_bundles = set()
 mappings = {}
 events = {}
@@ -350,8 +350,6 @@ def handle_cleanup(client_starttime):
 def wait_for_change(rloconf, filename, q):
     """Returns data, mimetype, changed_file, extra_headers
     """
-    global updated_variables_changed
-
     request_begin = time.time()
     blocking = q('blocking')
     client_starttime = q('starttime')
@@ -379,8 +377,10 @@ def wait_for_change(rloconf, filename, q):
         if changed_file:
             return None, None, changed_file, [], None
 
-        if updated_variables_changed:
-            updated_variables_changed = False
+        if updated_variables_changed.get(rloconf):
+            try:
+                del updated_variables_changed[rloconf]
+            except KeyError: pass
             return None, None, None, [], None
 
         data, mimetype, bundlefilename, extra_headers = data_for_updated_bundles(rloconf)
@@ -423,7 +423,6 @@ def send_rloevent_response(rloconf, environ, start_response):
 
 def send_file(environ, start_response, filename):
     global last_rloconf
-    global updated_variables_changed
 
     q = qenv(environ['QUERY_STRING'])
     rloconf = q('rloconf')
@@ -456,7 +455,9 @@ def send_file(environ, start_response, filename):
                         try:
                             del updated_variables[rloconf]
                         except KeyError: pass
-                        updated_variables_changed = False
+                        try:
+                            del updated_variables_changed[rloconf]
+                        except KeyError: pass
                 else:
                     filename = changed_file
                     data, mimetype, encoding = data_from_file(rloconf, filename)
@@ -652,7 +653,6 @@ def set_update_variable(rloconf, key, value, vartype):
 
 def update_variable(environ, start_response):
     global updated_variables
-    global updated_variables_changed
 
     paramstring = ''
     if environ.get('REQUEST_METHOD') == 'POST':
@@ -685,7 +685,8 @@ def update_variable(environ, start_response):
     for key, value, vartype in parameters:
         set_update_variable(rloconf, key, value, vartype)
 
-    updated_variables_changed = len(parameters) > 0
+    if len(parameters) > 0:
+        updated_variables_changed[rloconf] = True
     data = ''
     response_headers = [('Content-type', 'text/html'),
                         ('Content-Length', str(len(data)))
@@ -812,7 +813,6 @@ def osc_message(environ, start_response):
 
 def handle_osc(params):
     global updated_variables
-    global updated_variables_changed
     rloconf = last_rloconf
     mapping = mappings.get(rloconf)
     if mapping is None:
@@ -825,7 +825,7 @@ def handle_osc(params):
                 set_update_variable(rloconf, target, varvalue, 'auto')
                 changed = True
     if changed:
-        updated_variables_changed = True
+        updated_variables_changed[rloconf] = True
     else:
         # No mapping found, log this message
         if log_unmapped_osc_events:

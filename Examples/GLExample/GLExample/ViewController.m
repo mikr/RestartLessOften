@@ -463,6 +463,14 @@ void SKScanHexColor(NSString * hexString, float * red, float * green, float * bl
 
 #ifdef RLO_ENABLED
 
+/*
+
+When the RLO server is running you can change parameters by clicking on links
+http://localhost:8080/update/GLExample?backgroundcolor=%23F00
+http://localhost:8080/update/GLExample?backgroundcolor=%230F0
+http://localhost:8080/update/GLExample?backgroundcolor=%23A5A5A5FF
+
+*/
 - (void)rloNotification:(NSNotification *)aNotification
 {
     NSLog(@"rloNotification: %@", aNotification);

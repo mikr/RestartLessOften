@@ -10,9 +10,9 @@ import plistlib
 def rloconfiguration():
     T = dict(
               rlo = dict(
-                  log_http_requests = 0,
+                  log_http_requests = 1,
                   hostname_resolution = 0,
-                  generate_urls = 3,  # 0: don't, 1: rlo://, 2: vemmi://, 3: http://
+                  generate_urls = 4,  # 0: don't, 1: rlo://, 2: vemmi://, 3: http://hostname.local, 4: http://localhost
                   generate_urls_if_num_diffs_less_than = 10,
                   show_nondefault_vars = 1,   # 1: show diff once, 2: show diff every time
                   show_config_diffs = 1,

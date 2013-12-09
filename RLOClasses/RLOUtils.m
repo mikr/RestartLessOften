@@ -899,6 +899,8 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
             NSString *pathargs = [NSString stringWithFormat:@"%@/update?%@", projectname, paramlist];
             NSString *url = [NSString stringWithFormat:@"%@://%@", protocol, pathargs];
             printf("=======================================================================\n");
+            NSString *serverurl;
+            NSArray *host_port, *comps;
             switch (generate_urls) {
 #ifdef HAVE_XCADDEDMARKUP
                 case 1: RLOPrint(@"%@", DebugLink(url)); break;
@@ -907,8 +909,18 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 #endif
                 case 2: RLOPrint(@"%@", url); break;
                 default:
-                    RLOPrint(@"%@/%@", RLOGetObject(RLOVAR_HTTP_SERVER),
-                             [NSString stringWithFormat:@"update/%@?%@", projectname, paramlist]);
+                    serverurl = RLOGetObject(RLOVAR_HTTP_SERVER);
+                    if (generate_urls == 4) {
+                        // Replace hostname.local with localhost
+                        comps = [serverurl pathComponents];
+                        host_port = [comps[1] componentsSeparatedByString:@":"];
+                        if (host_port.count > 1) {
+                            serverurl = [NSString stringWithFormat:@"%@//localhost:%@", comps[0], host_port[host_port.count - 1]];
+                        } else {
+                            serverurl = [NSString stringWithFormat:@"%@//localhost", comps[0]];
+                        }
+                    }
+                    RLOPrint(@"%@/%@", serverurl, [NSString stringWithFormat:@"update/%@?%@", projectname, paramlist]);
                     break;
             }
             printf("=======================================================================\n");
