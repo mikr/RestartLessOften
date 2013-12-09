@@ -57,9 +57,8 @@ and this checked import:
 to `main.m` as well as the startup code
 ```objective.c
 #ifdef RLO_ENABLED
-        RLOStartChecking;
+        RLO_WATCH_CODE_UPDATES;
         RLO_INIT_CONFIGURATION(RLO_CONFIG_PATH, RLO_SERVERURL);
-        RLO_LOAD_CONFIGURATION(nil);
         RLO_START_CONF_LOADER;
 #endif
 ```

@@ -5,7 +5,7 @@
 
 #ifdef RLO_ENABLED
 
-#define RLOStartChecking do { [RLOBundleUpdater startChecking:RLO_USE_POLLING]; } while(0)
+#define RLO_WATCH_CODE_UPDATES do { [RLOBundleUpdater startChecking:RLO_USE_POLLING]; } while(0)
 #define RLOaddObserver(observer, theSelector) do { [[NSNotificationCenter defaultCenter] addObserver:observer selector:theSelector name:RLOTIfiNotification object:nil]; } while(0)
 #define RLOremoveObserver(observer) do { [[NSNotificationCenter defaultCenter] removeObserver:self name:RLOTIfiNotification object:nil]; } while(0)
 #define RLONotificationContainsClassname(aNotification, classnames) [RLOBundleUpdater containsChangedClassname:classnames notification:aNotification]

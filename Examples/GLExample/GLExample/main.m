@@ -19,9 +19,8 @@ int main(int argc, char * argv[])
         NSString *appClass = nil;
 #ifdef RLO_ENABLED
         appClass = @"RLOUIApplication";
-        RLOStartChecking;
+        RLO_WATCH_CODE_UPDATES;
         RLO_INIT_CONFIGURATION(RLO_CONFIG_PATH, RLO_SERVERURL);
-        RLO_LOAD_CONFIGURATION(nil);
         RLO_START_CONF_LOADER;
 #endif
         return UIApplicationMain(argc, argv, appClass, NSStringFromClass([AppDelegate class]));

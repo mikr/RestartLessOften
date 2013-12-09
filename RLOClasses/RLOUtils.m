@@ -738,17 +738,22 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     RLOSetObject(RLOVAR_HTTP_SERVER, theServerURL);
 }
 
++ (NSString *)defaultClientID
+{
+    if (starttime == 0) {
+        starttime = [[NSDate date] timeIntervalSince1970];
+    }
+    return [NSString stringWithFormat:@"%f", starttime];
+}
+
 + (int)loadRLOConfiguration:(NSString *)client_id blocking:(BOOL)blocking
 {
     NSData *data = nil;
     NSString *blocking_param = blocking ? @"&blocking=1" : @"";
     BOOL succeeded = NO;
     
-    if (starttime == 0) {
-        starttime = [[NSDate date] timeIntervalSince1970];
-    }
     if (! client_id) {
-        client_id = [NSString stringWithFormat:@"%f", starttime];
+        client_id = [[self class] defaultClientID];
     }
     
     if ([client_id hasSuffix:@".plist"])  {
@@ -945,6 +950,11 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 
 + (void)startConfLoader
 {
+    // Although we a request blocking the request returns immediately because a client with this
+    // starttime has not requested the configuration before.
+    // blocking:YES is necessary so that the next request on the background thread is blocked
+    // (until a config change happens) and we only get a single RLO change notification instead of two.
+    [[self class] loadRLOConfiguration:[[self class] defaultClientID] blocking:YES];
     [[self class] performSelectorInBackground:@selector(confLoader:) withObject:nil];
 }
 

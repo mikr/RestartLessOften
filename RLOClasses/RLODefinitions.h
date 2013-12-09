@@ -14,7 +14,7 @@
 
 #else
 
-#define RLOStartChecking
+#define RLO_WATCH_CODE_UPDATES
 #define RLOaddObserver(observer, theSelector)
 #define RLOremoveObserver(observer)
 #define RLONotificationContainsClassname(aNotification, classnames) NO
