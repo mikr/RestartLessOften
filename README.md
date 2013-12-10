@@ -23,11 +23,6 @@ DrawExample is a simple Cocoa app with a `-drawRect:` method in `DrawView.m` tha
 
 RestartLessOften tries to be minimally invasive. Because embedding an HTTP server in an app is way more complicated than emitting HTTP requests your Mac is the server-side and your app is the client.
 Your app downloads the configuration file as a plist and updates the global dictionary with the current parameter values. Immediately afterwards it starts the next request but the server is blocking the request until some parameter has changed.
-
-## Your main.m
-
-You probably know that before `applicationDidFinishLaunching:` is called a lot of your code has already run.
-To give all of your code a chance to run with the current `rloconfig.py` the first download is synchronous on the main-thread, all following requests are on a background thread.
  
 ## The configuration file
 
@@ -42,7 +37,7 @@ def rloconfiguration():
                   log_http_requests = 0,
                   generate_urls = 0,
                   generate_urls_if_num_diffs_less_than = 10,
-                  show_nondefault_vars = 1,   # 1: show diff once, 2: show diff every time
+                  show_nondefault_vars = 1, # 1: show diff once, 2: show diff every time
                   show_config_diffs = 1,
                   show_config_diffs_if_num_diffs_less_than = 10,
                   persistent_updates = 0,
@@ -70,14 +65,40 @@ def rloconfiguration():
 
 The `rlo` section is used by `rlo_server.py` and the RLO code inside your app. Some other variables `watch_files`, `watch_xibfiles`,  `ignore_files` are also used by `rlo_server.py` to see if resources of your app have changed.
 
+# Explicit default values
+
+When using RLO it should be very easy to tell what value is used when RLO is either not used (`RLO_ENABLED` is undefined) or when the RLO server is not running.
+Each of the RLOGet macros has a second parameter that is the value being used in these cases.
+The macro
+```objective-c
+RLOGetInt(@"num_triangles", 36)
+```
+will return the current value and the first time it differs from its default this will be logged, e.g.:
+```
+NDVi: num_triangles (default 36) is currently 12
+```
+
+## RLO startup in main.m
+
+You probably know that before `applicationDidFinishLaunching:` is called a lot of your code has already run.
+To give all of your code a chance to run with the current `rloconfig.py` the first config download is synchronous on the main-thread before the usual program startup with `UIApplicationMain` or `NSApplicationMain` begins. All following config downloads are on a background thread.
+
 ## The RLO Server
 
 You start one `rlo_server.py` on your Mac which accepts and handles requests from several different apps at once, each request tells the server to which app and `rloconfig.py` it belongs.
 
 ## RLO_ENABLED
 
-RestartLessOften only uses `#ifdef RLO_ENABLED` to include RLO code into your app. If you use `#if DEBUG` or something else is your choice but please make sure that you never distribute an application where `RLO_ENABLED` was still defined. It would send requests to a host with your local hostname on the network of your users which would be embarrassing for you and me.  
+RestartLessOften only uses `#ifdef RLO_ENABLED` to include RLO code into your app.
+If you use this:
+```objective-c
+#if DEBUG
+#define RLO_ENABLED
+#endif
+```
+or something else is your choice but please make sure that you never distribute an application where `RLO_ENABLED` was still defined. It would send requests to a host with your local hostname on the network of your users which would be embarrassing for you and me.  
 On the upside if you get this one right you never have to remove RLO code from your app before building the distribution binary.
+All RLO classes are within '#ifdef RLO_ENABLED ... #endif' the only thing remaining in effect for a distribution build are the RLO macros that will either do nothing, return 0, NO, nil or the given default value for RLOGet macros (see `RLODefinitions.h`).
 
 Another goal of RestartLessOften is that if `RLO_ENABLED` is undefined no code at all should be included that is only needed by RLO and not the app itself. See `Classes without -dealloc` for an example.
 
@@ -99,6 +120,28 @@ But make sure to remove the `#ifdef RLO_ENABLED` if any other code gets added to
 
 RestartLessOften supports sending key events from the Mac keyboard into the iOS Simulator. This makes use of undocumented APIs and is likely to break with a minor update of the iOS Simulator. If you really want to send key events into your app that is running on the device, you can start build and run RLOApp and keep it in the foreground. Key events are send from `RLOApp` via the RLO server to your app. See `GLExample/Viewcontroller.m` how to handle key events. This method of forwarding key events is also a bit brittle but may be useful nonetheless.
 
+# Changing Parameters via HTTP requests
+
+When you want to change parameters like `num_triangles` in the GLExample many times like toggling back and forth between 12 and 36, changing the `rloconfig.py` manually and saving each time becomes tiresome. When `rlo.generate_urls` is set each change results in a URL being printed to the console. Change `num_triangles` from 36 to 12 and save `rloconfig.py` and this URL appears in the console.
+```
+http://localhost:8080/update/GLExample?num_triangles=12
+```
+Change it back to 36 and you get the URL with `num_triangles=36`. You can now use these URLs anywhere on your Mac to change this parameter by clicking on one of the URLs.
+If you change several parameters and save them at once they will appear together in a single URL.
+
+Different types of URLs are supported each with their own pros and cons.
+
+1. `rlo://` This is a custom URL scheme which needs [XcAddedMarkup](https://github.com/mikr/XcAddedMarkup) and RLOApp which is included with RestartLessOften. These can be clicked directly in the Xcode console after they have been printed.
+2. `vemmi://` Xcode recognizes these as valid URLs, RLOApp is registered for them and if they are clicked the default browser does not open which is nice.
+3. `http://hostname.local` These work on your local network.
+4. `http://localhost` Those are preferable if you want to share links with others.
+
+Advanced users may want to compile and run `RLOApp` with
+```objective-c
+[NSApp setActivationPolicy:NSApplicationActivationPolicyProhibited];
+```
+present in `AppDelegate.m`. This allows clicking on rlo: or vemmi: links in your source code with no application annoyingly opening itself in the front. With this you can switch rapidly between parameter sets by embedding vemmi: links for example in source comments near the code that deals with them.
+
 # Enabling C++ sources
 
 If you want code updates in Objective-C++ files, make a copy of RLORebuildCode.m named RLORebuildCode.mm and add it to the Xcode project only for the target RLOUpdaterBundleGLExample. The script `rlo_newerfiles.py` generates imports for Objective-C++ files into RLORebuildCode.mm. The need for this distinction is that the default include paths for Objective-C and Objective-C++ are different and this is handled by having these two files.
@@ -107,9 +150,10 @@ If you want code updates in Objective-C++ files, make a copy of RLORebuildCode.m
 
 * auto-synthesized properties
 	-	I have had problems updating code in classes with auto-synthesized properties, which resulted in the new code having a different class layout.
-Manually adding the synthesize `@synthesize theproperty=_theproperty;` fixed these kind of problems.
+Manually adding the synthesize `@synthesize theproperty=_theproperty;` fixed these kind of problems. This might have been caused by certain clang versions in the past and may not be a problem any more. 
 * class layout changes
-	* when adding, removing or renaming an instance variable or property a code update requires a restart of the app.
+	
+	- when adding, removing or renaming an instance variable or property a code update requires a restart of the app.
 
 ## Security
 
@@ -124,7 +168,7 @@ There is a lot more documentation to be written about this project but first I w
 RestartLessOften was written by [Michael Krause](http://krause-software.com).
 
 John Holdsworth must be credited for creating Injection for Xcode https://github.com/johnno1962/injectionforxcode
-from where I picked up the code update technique via bundles. You should definitely try out this his tool which is much easier to set up than RestartLessOften and may be more suitable for you.
+from where I picked up the code update technique via bundles. You should definitely try out his tool which is much easier to set up than RestartLessOften and may be more suitable for you.
 
 The Dynamic code injection Tool https://github.com/DyCI/dyci-main helped a lot in requiring less manual modifications of the users source code to enable code updates.
 
