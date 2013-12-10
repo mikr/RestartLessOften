@@ -215,7 +215,19 @@ BOOL shadersChanged;
 
 #pragma mark - GLKView and GLKViewController delegate methods
 
+// It looks like the -[GLKViewController _updateAndDraw] method keeps
+// a reference to the old -update method of this class after a code update.
+// In a rare case like this adding a simple redirecton enables these methods
+// also to be effectively updated without any change for a distribution build.
+#ifdef RLO_ENABLED
 - (void)update
+{
+    [self update_];
+}
+- (void)update_
+#else
+- (void)update
+#endif
 {
     float aspect = fabsf(self.view.bounds.size.width / self.view.bounds.size.height);
     GLKMatrix4 projectionMatrix = GLKMatrix4MakePerspective(GLKMathDegreesToRadians(65.0f), aspect, 0.1f, 100.0f);
