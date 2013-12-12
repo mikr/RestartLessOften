@@ -65,7 +65,7 @@ def rloconfiguration():
 
 The `rlo` section is used by `rlo_server.py` and the RLO code inside your app. Some other variables `watch_files`, `watch_xibfiles`,  `ignore_files` are also used by `rlo_server.py` to see if resources of your app have changed.
 
-# Explicit default values
+## Explicit default values
 
 When using RLO it should be very easy to tell what value is used when RLO is either not used (`RLO_ENABLED` is undefined) or when the RLO server is not running.
 Each of the RLOGet macros has a second parameter that is the value being used in these cases.
@@ -87,6 +87,19 @@ To give all of your code a chance to run with the current `rloconfig.py` the fir
 
 You start one `rlo_server.py` on your Mac which accepts and handles requests from several different apps at once, each request tells the server to which app and `rloconfig.py` it belongs.
 
+## XcAddedMarkup
+
+The Xcode plugin [XcAddedMarkup](https://github.com/mikr/XcAddedMarkup) supports RLO in that it recognizes macros like `RLOGetInt(@"num_triangles, 36)` in the source code when the cursor is positioned in a macro call. In this situation XcAddedMarkup tries to get the most recent RLO config from the RLO server and if it downloads a proper config it shows a popup with a slider and text field. Changing the slider or textfield is immediately reflected in the running application. The parameter change is not persistent, if you want to keep the current value it must be copied as default parameter or into the `rloconfig.py`.
+
+A default slider of XcAddedMarkup has a default range from 0 to 100 which is almost always wrong. By adding a dictionary next to and named as the parameter itself followed by `_spec` the min and max values for the slider can be specified.
+
+```python
+num_triangles = 36,
+num_triangles_spec = dict(
+	min=0, max=36
+)
+```
+
 ## RLO_ENABLED
 
 RestartLessOften only uses `#ifdef RLO_ENABLED` to include RLO code into your app.
@@ -102,7 +115,7 @@ All RLO classes are within '#ifdef RLO_ENABLED ... #endif' the only thing remain
 
 Another goal of RestartLessOften is that if `RLO_ENABLED` is undefined no code at all should be included that is only needed by RLO and not the app itself. See `Classes without -dealloc` for an example.
 
-# Classes without `-dealloc`
+## Classes without `-dealloc`
 
 If `RLOremoveObserver(self)` would be the only thing in your `-dealloc` method, an empty `-dealloc` would still remain when `RLO_ENABLED` is not defined. 
 To remove `-dealloc` for a clean distribution build you use this:
@@ -116,11 +129,11 @@ To remove `-dealloc` for a clean distribution build you use this:
 ```
 But make sure to remove the `#ifdef RLO_ENABLED` if any other code gets added to the `-dealloc` of this class.
 
-# Keyboard support
+## Keyboard support
 
 RestartLessOften supports sending key events from the Mac keyboard into the iOS Simulator. This makes use of undocumented APIs and is likely to break with a minor update of the iOS Simulator. If you really want to send key events into your app that is running on the device, you can start build and run RLOApp and keep it in the foreground. Key events are send from `RLOApp` via the RLO server to your app. See `GLExample/Viewcontroller.m` how to handle key events. This method of forwarding key events is also a bit brittle but may be useful nonetheless.
 
-# Changing Parameters via HTTP requests
+## Changing Parameters via HTTP requests
 
 When you want to change parameters like `num_triangles` in the GLExample many times like toggling back and forth between 12 and 36, changing the `rloconfig.py` manually and saving each time becomes tiresome. When `rlo.generate_urls` is set each change results in a URL being printed to the console. Change `num_triangles` from 36 to 12 and save `rloconfig.py` and this URL appears in the console.
 ```
@@ -142,7 +155,7 @@ Advanced users may want to compile and run `RLOApp` with
 ```
 present in `AppDelegate.m`. This allows clicking on rlo: or vemmi: links in your source code with no application annoyingly opening itself in the front. With this you can switch rapidly between parameter sets by embedding vemmi: links for example in source comments near the code that deals with them.
 
-# Enabling C++ sources
+## Enabling C++ sources
 
 If you want code updates in Objective-C++ files, make a copy of RLORebuildCode.m named RLORebuildCode.mm and add it to the Xcode project only for the target RLOUpdaterBundleGLExample. The script `rlo_newerfiles.py` generates imports for Objective-C++ files into RLORebuildCode.mm. The need for this distinction is that the default include paths for Objective-C and Objective-C++ are different and this is handled by having these two files.
 
