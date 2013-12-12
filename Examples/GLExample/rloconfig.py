@@ -50,7 +50,14 @@ def rloconfiguration():
 
               backgroundcolor = "#A5A5A5FF",
               disable_glkitcube = 0,
+              disable_glkitcube_spec = dict(
+                  min=0, max=1
+              ),
+
               num_triangles = 36,
+              num_triangles_spec = dict(
+                  min=0, max=36
+              )
     )
     return T
 

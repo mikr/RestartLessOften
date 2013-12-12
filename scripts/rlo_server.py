@@ -99,6 +99,7 @@ rlodicts = {}
 recent_configurations = set()
 client_starttimes = set()
 rloevents = {}
+lastconfigdatacache = {}
 
 def rlodict_for_rloconf(rloconf):
     rlodict = rlodicts.get(rloconf)
@@ -237,6 +238,10 @@ def rloconfigAsDict(rloconf):
     if overrides is not None:
         root = merge_dicts(root, overrides)
 
+    try:
+        root['rlo']['update_url'] = "http://localhost:%s/update/%s" % (RLO_LISTENER_PORT, projectname(rloconf))
+    except: pass
+
     # Extract some variables from the rloconfiguration for the RLO server
     try:
         log_http_requests = root['rlo']['log_http_requests']
@@ -264,6 +269,12 @@ def rloconfigAsDict(rloconf):
     except KeyError: pass
 
     return root
+
+def projectname(rloconf):
+    try:
+        return rloconf.split('/')[-2]
+    except:
+        return "unknown"
 
 def data_from_file(rloconf, filename):
     data = None
@@ -438,6 +449,7 @@ def send_file(environ, start_response, filename):
     recent_configurations.add(rloconf)
 
     extra_headers = []
+    root = None
     if filename == TESTCONF_NAME:
         use_xml = q('xml')
         data, mimetype, changed_file, extra_headers, changetype = wait_for_change(rloconf, filename, q)
@@ -476,6 +488,9 @@ def send_file(environ, start_response, filename):
                         ('Content-type', mimetype or 'text/plain')
                         ]
     response_headers.extend(extra_headers)
+
+    if filename == TESTCONF_NAME and root is not None:
+        lastconfigdatacache[rloconf] = data
 
     # Compress data as gzip if this is requested and it reduces the amount of traffic
     if data and 'gzip' in environ.get('HTTP_ACCEPT_ENCODING', ''):
@@ -767,6 +782,15 @@ def announce_bundle(environ, start_response):
     start_response("200 OK", [('Content-type', 'text/plain')])
     return ['']
 
+def download_rloconfig(environ, start_response):
+    data = lastconfigdatacache.get(last_rloconf)
+    if data is None:
+        start_response("404 Not Found", [('Content-type', 'text/plain')])
+        return ['RLO config not found']
+
+    start_response("200 OK", [('Content-type', 'text/plain')])
+    return [data]
+
 def take_screenshot(environ, start_response):
     qparams = urlparse.parse_qs(environ['QUERY_STRING'])
     filename = qparams.get('filename')
@@ -867,6 +891,9 @@ def my_app(environ, start_response):
 
     if environ['PATH_INFO'] == '/takescreenshot':
         return take_screenshot(environ, start_response)
+
+    if environ['PATH_INFO'] == '/rloconfig':
+        return download_rloconfig(environ, start_response)
 
     path = environ['PATH_INFO']
     if path == '/':
