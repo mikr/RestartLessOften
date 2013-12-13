@@ -6,6 +6,12 @@ This project offers some tools to reduce the number of restarts when adjusting n
 
 To enable your code to use RestartLessOften you have to include some source files into your Xcode project and create a configuration file for your app which you can modify at runtime to feed parameter changes into your app.
 
+If the optional Xcode plugin [XcAddedMarkup](https://github.com/mikr/XcAddedMarkup) is installed you can even change parameters via a popup in your Xcode source editor.
+
+<p align="center" >
+  <img src="https://raw.github.com/mikr/XcAddedMarkup/master/images/rloslider.png" alt="RestartLessOften with XcAddedMarkup" title="RestartLessOften with XcAddedMarkup">
+</p>
+
 ## QuickStart
 
 First start `rlo_server.py` in a Terminal window. RestartLessOften comes with two preconfigured examples, one for iOS another for OS X that should just build and run.
