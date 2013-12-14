@@ -86,37 +86,37 @@ def find_newerfiles(filename, projectdir):
     cppimportlines = []
     importlines.append("#ifdef RLO_ENABLED")
     cppimportlines.append("#ifdef RLO_ENABLED")
-    rcf = rebuildcodefilename(projectdir)
-    cppfileexists = projectdir and rcf and os.path.exists(rcf + 'm')
+    rcname = rebuildcodefilename(projectdir)
+    # Does a RLORebuildCode.mm exist beside RLORebuildCode.m ?
+    if rcname:
+        rcname_mm = rcname + 'm'
+    else:
+        rcname_mm = None
+    cppfileexists = projectdir and rcname and os.path.exists(rcname_mm)
+    cppexts = ".C .cc .cpp .CPP .c++ .cp .cxx .mm".split()
+    cexts = ".c .m".split()
     for sourcename in sourcenames:
-        if sourcename.endswith('.h'):
+        ext = os.path.splitext(sourcename)[1]
+        if ext not in cexts and ext not in cppexts:
             continue
         try:
             sourcetime = os.path.getmtime(sourcename)
         except OSError:
             continue
         if sourcetime > exetime or (latest_appstart is not None and sourcetime > latest_appstart):
-            if cppfileexists and sourcename.endswith('.mm'):
+            if cppfileexists and ext in cppexts:
                 cppimportlines.append('#import "%s"' % sourcename)
-            else:
+            elif ext in cexts:
                 importlines.append('#import "%s"' % sourcename)
     importlines.append("#endif")
     cppimportlines.append("#endif")
     importtext = "\n".join(importlines) + "\n"
     cppimporttext = "\n".join(cppimportlines) + "\n"
 
-    if projectdir:
-        rcname = rebuildcodefilename(projectdir)
-        if rcname:
-            ret1 = overwrite_text(rcname, importtext)
-            if cppfileexists:
-                ret1 = overwrite_text(rcname + 'm', cppimporttext) | ret1
-            if ret1:
-                # Do not overwrite the data with the same content.
-                # This preserves the timestamp and reduces build time.
-                return
-    print importtext
-    print cppimporttext
+    if projectdir and rcname:
+        overwrite_text(rcname, importtext)
+        if cppfileexists:
+            overwrite_text(rcname_mm, cppimporttext)
 
 def overwrite_text(filename, text):
     olddata = None
