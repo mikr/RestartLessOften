@@ -9,7 +9,7 @@ To enable your code to use RestartLessOften you have to include some source file
 If the optional Xcode plugin [XcAddedMarkup](https://github.com/mikr/XcAddedMarkup) is installed you can even change parameters via a popup in your Xcode source editor.
 
 <p align="center" >
-  <img src="https://raw.github.com/mikr/XcAddedMarkup/master/images/rloslider.png" alt="RestartLessOften with XcAddedMarkup" title="RestartLessOften with XcAddedMarkup">
+  <img src="https://raw.github.com/wiki/mikr/RestartLessOften/images/RLOanimation.gif" alt="RestartLessOften animation" title="RestartLessOften animation">
 </p>
 
 ## QuickStart
