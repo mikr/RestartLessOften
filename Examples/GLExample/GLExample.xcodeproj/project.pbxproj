@@ -86,6 +86,7 @@
 		4C591E461852635E0004C548 /* GLExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GLExampleTests.m; sourceTree = "<group>"; };
 		4C804D2918547D2A00EC2D38 /* RLOUIApplication.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLOUIApplication.h; sourceTree = "<group>"; };
 		4C804D2A18547D2A00EC2D38 /* RLOUIApplication.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLOUIApplication.m; sourceTree = "<group>"; };
+		4C8B7F82187DABF40011E96B /* rloconfig.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = rloconfig.py; sourceTree = SOURCE_ROOT; };
 		4CBFFDED1854963A0005ECA9 /* RLOBundleUpdater.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLOBundleUpdater.h; sourceTree = "<group>"; };
 		4CBFFDEE1854963A0005ECA9 /* RLOBundleUpdater.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLOBundleUpdater.m; sourceTree = "<group>"; };
 		4CBFFDEF1854963A0005ECA9 /* RLODefinitions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLODefinitions.h; sourceTree = "<group>"; };
@@ -207,6 +208,7 @@
 		4C591E1B1852635E0004C548 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4C8B7F82187DABF40011E96B /* rloconfig.py */,
 				4C591E1C1852635E0004C548 /* GLExample-Info.plist */,
 				4C591E1D1852635E0004C548 /* InfoPlist.strings */,
 				4C591E201852635E0004C548 /* main.m */,

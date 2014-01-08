@@ -45,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		4C8B7F83187DB26F0011E96B /* rloconfig.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = rloconfig.py; sourceTree = SOURCE_ROOT; };
 		4CBFFE381854A8270005ECA9 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		4CBFFE391854A8270005ECA9 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 		4CBFFE4A1854AFA90005ECA9 /* RLOUpdaterBundleDrawExample.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RLOUpdaterBundleDrawExample.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -210,6 +211,7 @@
 		4CF0AD501853DB7D003AEA7A /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				4C8B7F83187DB26F0011E96B /* rloconfig.py */,
 				4CF0AD511853DB7D003AEA7A /* DrawExample-Info.plist */,
 				4CF0AD521853DB7D003AEA7A /* InfoPlist.strings */,
 				4CF0AD551853DB7D003AEA7A /* main.m */,

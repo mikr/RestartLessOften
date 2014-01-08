@@ -505,7 +505,7 @@ http://localhost:8080/update/GLExample?backgroundcolor=%23A5A5A5FF
     }
     
     // By storing variables in the global RLO dictionary, parameter tweaks can be
-    // added with introducing new instance variables.
+    // added without introducing new instance variables.
     if (RLONotificationHasKeyCombo(aNotification, @"F")) {
         RLOSetFloat(@"ztranslation", RLOGetFloat(@"ztranslation", 0.0) + 0.1);
     } else if (RLONotificationHasKeyCombo(aNotification, @"Shift-F")) {
