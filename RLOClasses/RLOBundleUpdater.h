@@ -8,6 +8,7 @@
 #define RLOBundleUpdater_h
 
 #ifdef RLO_ENABLED
+#ifdef __OBJC__
 
 #import "RLOUtils.h"
 
@@ -36,5 +37,6 @@ typedef NS_ENUM(NSUInteger, KeyEventStatus) {
 
 @end
 
+#endif
 #endif
 #endif

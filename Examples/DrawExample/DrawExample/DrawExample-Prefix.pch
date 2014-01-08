@@ -6,11 +6,11 @@
 
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-
-    #if DEBUG
-    #define RLO_ENABLED
-    #import "RLODefinitions.h"
-    #define RLO_CONFIG_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
-    #endif
-
 #endif
+
+#if DEBUG
+    #define RLO_ENABLED
+    #define RLO_CONFIG_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
+#endif
+
+#include "RLODefinitions.h"

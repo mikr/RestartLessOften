@@ -37,13 +37,13 @@ Create a copy of the directory RLORebuildCode in templates into Examples/GLExamp
 
 Add the directory `RLOClasses` to your Xcode project for the GLExample target.
 
-Add this checked import
+Add these preprocessor statements
 ```objective-c
 #if DEBUG
-#define RLO_ENABLED
-#import "RLODefinitions.h"
-#define RLO_CONFIG_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
+    #define RLO_ENABLED
+    #define RLO_CONFIG_PATH (RLO_BUNDLEUPDATE_SRCROOT "/rloconfig.py")
 #endif
+#include "RLODefinitions.h"
 ```
 to GLExample-Prefix.pch at the end of the `#ifdef __OBJC__` block.
 

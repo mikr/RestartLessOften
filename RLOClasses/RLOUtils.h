@@ -66,6 +66,7 @@
 
 #define RLOTIfiNotification @"RLOTIfiNotification"
 
+#ifdef __OBJC__
 
 extern NSMutableDictionary *rlo_vars_dict;
 
@@ -128,5 +129,7 @@ extern NSMutableDictionary *rlo_vars_dict;
 + (void)addRLOResponseHandler:(id)handler;
 
 @end
+
+#endif
 
 #endif
