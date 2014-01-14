@@ -39,6 +39,7 @@ import decimal
 import socket
 import struct
 import glob
+import fnmatch
 import re
 import math
 
@@ -165,7 +166,7 @@ def find_file(rloconf, filename):
 
 def nibdata_for_xibfile(rloconf, filename):
     _, tmpnibfile = tempfile.mkstemp()
-    commandAndArgs = 'ibtool --compile %s %s' % (tmpnibfile, find_file(rloconf, filename))
+    commandAndArgs = 'xcrun ibtool --compile %s %s' % (tmpnibfile, find_file(rloconf, filename))
     proc = subprocess.Popen(commandAndArgs, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     fp = open(tmpnibfile, 'rb')
@@ -279,7 +280,7 @@ def projectname(rloconf):
 def data_from_file(rloconf, filename):
     data = None
     mimetype, encoding = mimetypes.guess_type(filename)
-    if filename in watch_xibfiles:
+    if is_watched_xibfile(filename):
         # Serve compiled xib
         data = nibdata_for_xibfile(rloconf, filename)
     else:
@@ -295,6 +296,12 @@ def data_from_file(rloconf, filename):
                 except IOError:
                     pass
     return data, mimetype, encoding
+
+def is_watched_xibfile(filename):
+    for pattern in watch_xibfiles:
+        if fnmatch.fnmatch(filename, pattern):
+            return True
+    return False
 
 #=======================================================================
 
