@@ -324,8 +324,14 @@ def file_changed(client_starttime, watchfiles):
             if absname is not None:
                 mtime = os.path.getmtime(absname)
                 oldmtime = client_list.get(client_starttime)
-                if not oldmtime or (mtime > oldmtime):
-                    client_list[client_starttime] = mtime
+                # On the first request TESTCONF_NAME is always considered changed
+                has_changed = oldmtime is None and f == TESTCONF_NAME
+                if oldmtime is not None:
+                    has_changed = has_changed or mtime > oldmtime
+                if has_changed:
+                    # A file is considered changed when it was modified after the
+                    # the last time some file had changed.
+                    client_list[client_starttime] = max(float(client_starttime), mtime)
                     changed_file = f
                     break
         except OSError:

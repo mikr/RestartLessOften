@@ -860,6 +860,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
 + (void)notifyRLOConfigurationChange:(NSDictionary *)aUserInfo
 {
     [[NSNotificationCenter defaultCenter] postNotificationName:RLOTIfiNotification object:[self class] userInfo:aUserInfo];
+    [self clearLastDiffDict];
 }
 
 + (NSArray *)generateRLOURL:(NSDictionary *)dictdiff keypath:(NSString *)keypath
