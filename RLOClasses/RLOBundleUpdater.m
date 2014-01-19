@@ -528,12 +528,14 @@ typedef NS_ENUM(NSUInteger, KeyEventMode) {
         ev.last_nonsynthetic = now;
         if (first_event) {
 #if !TARGET_OS_IPHONE
-            start_timer = YES;
+            start_timer = NO;
 #endif
         }
         
         if ([[keyinfo objectForKey:@"event"] isEqualToString:@"KeyUp"]) {
-            [pressedkeys removeObjectForKey:keycombo];
+            if (keycombo) {
+                [pressedkeys removeObjectForKey:keycombo];
+            }
             [resultinfo setObject:@YES forKey:@"keyup"];
             send_notification = YES;
         }

@@ -198,13 +198,37 @@ typedef struct __GSEvent* GSEventRef;
 
 - (void)processEvent:(PhysicalKeyboardEvent *)event
 {
+    static NSMutableDictionary *pressedkeys = nil;
+    if (! pressedkeys) {
+        pressedkeys = [[NSMutableDictionary alloc] init];
+    }
+    
+    NSString *unmodifiedInput = [event _unmodifiedInput];
+    NSString *modifiedInput = [event _modifiedInput];
     long keycode = [event _keyCode];
+    int _gsModifierFlags = [event _gsModifierFlags];
     BOOL iskeydown = [event _isKeyDown];
-    NSString *key = [RLOCharacterMapping stringForKeycode:keycode];
-    NSString *keycombo = [RLOCharacterMapping modifiedCharnames:key modifierFlags:[event _gsModifierFlags]];
+    NSString *key;
+    if (iskeydown) {
+        key = [RLOCharacterMapping stringForKeycode:keycode characters:modifiedInput charactersIgnoringModifiers:unmodifiedInput];
+        // We only have modifiedInput or unmodifiedInput on KeyDown so we
+        // save it here and retrieve it on KeyUp.
+        pressedkeys[@(keycode)] = @{@"key": key,
+                                    @"unmodifiedInput": unmodifiedInput,
+                                    @"modifiedInput": modifiedInput
+                                    };
+    } else {
+        NSDictionary *keyinfo = pressedkeys[@(keycode)];
+        key = keyinfo[@"key"];
+        unmodifiedInput = keyinfo[@"unmodifiedInput"];
+        modifiedInput = keyinfo[@"modifiedInput"];
+        [pressedkeys removeObjectForKey:@(keycode)];
+    }
+    
+    NSString *keycombo = [RLOCharacterMapping modifiedCharnames:key modifierFlags:_gsModifierFlags];
     NSMutableDictionary *keyinfo = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                              [NSNumber numberWithShort:keycode], @"keycode",
-                             [NSNumber numberWithInt:[event _gsModifierFlags]], @"eventFlags",
+                             [NSNumber numberWithInt:_gsModifierFlags], @"eventFlags",
                              key, @"key",
                              keycombo, @"keycombo",
                              nil];
@@ -222,11 +246,14 @@ typedef struct __GSEvent* GSEventRef;
 
 #ifdef RLO_ENABLED
 // This does not work any more with iOS 7.
-#ifndef __IPHONE_7_0
+#ifdef RLO_ENABLE_IOS6_SIMULATOR_KEYBOARD
 
 - (void)sendEvent:(UIEvent *)event
 {
     [super sendEvent:event];
+    if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
+        return;
+    }
     if ([event respondsToSelector:@selector(_gsEvent)]) {
         // Key events come in form of UIInternalEvents.
         // They contain a GSEvent object which containsan
@@ -239,7 +266,7 @@ typedef struct __GSEvent* GSEventRef;
                 int tmp = eventMem[GSEVENTKEY_KEYCODE];
                 UniChar *keycode = (UniChar *)&tmp;
                 UniChar code = keycode[0];
-                NSString *key = [RLOCharacterMapping stringForKeycode:code];
+                NSString *key = [RLOCharacterMapping stringForIOS6Keycode:code];
                 NSString *keycombo = [RLOCharacterMapping modifiedCharnames:key modifierFlags:eventFlags];
                 
                 NSDictionary *keyinfo = [[NSDictionary alloc] initWithObjectsAndKeys:

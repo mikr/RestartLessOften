@@ -25,13 +25,13 @@ typedef enum GSEventFlags {
 @interface RLOCharacterMapping : NSObject
 
 #if TARGET_OS_IPHONE
-+ (NSString *)stringForKeycode:(UniChar)keycode;
-#else
-+ (NSString *)stringForKeycode:(int64_t)keycode;
++ (NSString *)stringForIOS6Keycode:(UniChar)keycode;
 #endif
++ (NSString *)stringForKeycode:(UniChar)keycode characters:(NSString *)characters charactersIgnoringModifiers:(NSString *)charactersIgnoringModifiers;
 
 + (NSString *)keynameForCharacters:(NSString *)text;
 + (NSString *)modifiedCharnames:(NSString *)charnames modifierFlags:(NSUInteger)modifierFlags;
++ (NSString *)modifiedCharnames:(NSString *)charnames characters:(NSString *)characters modifierFlags:(NSUInteger)modifierFlags;
 
 @end
 

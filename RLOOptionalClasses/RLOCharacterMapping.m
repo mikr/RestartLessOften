@@ -10,6 +10,12 @@
 
 #import "RLOCharacterMapping.h"
 
+typedef struct CharacterTable {
+    UniChar charactercode;
+    char *keyname;
+} CharacterTable;
+
+
 static NSString *keycodemapping_ios_german[] = {
     /*  0*/ @"",
     /*  1*/ @"",
@@ -124,260 +130,62 @@ static NSString *keycodemapping_ios_german[] = {
     /*  110*/ @"F19"
 };
 
-static NSString *keycodemapping_osx_german[] = {
-    /*  0*/ @"",
-    /*  1*/ @"",
-    /*  2*/ @"",
-    /*  3*/ @"",
-    /*  4*/ @"A",
-    /*  5*/ @"B",
-    /*  6*/ @"C",
-    /*  7*/ @"D",
-    /*  8*/ @"E",
-    /*  9*/ @"F",
-    /*  10*/ @"G",
-    /*  11*/ @"H",
-    /*  12*/ @"I",
-    /*  13*/ @"J",
-    /*  14*/ @"K",
-    /*  15*/ @"L",
-    /*  16*/ @"M",
-    /*  17*/ @"N",
-    /*  18*/ @"O",
-    /*  19*/ @"P",
-    /*  20*/ @"Q",
-    /*  21*/ @"R",
-    /*  22*/ @"S",
-    /*  23*/ @"T",
-    /*  24*/ @"U",
-    /*  25*/ @"V",
-    /*  26*/ @"W",
-    /*  27*/ @"X",
-    /*  28*/ @"Z",
-    /*  29*/ @"Y",
-    /*  30*/ @"1",
-    /*  31*/ @"2",
-    /*  32*/ @"3",
-    /*  33*/ @"4",
-    /*  34*/ @"5",
-    /*  35*/ @"6",
-    /*  36*/ @"7",
-    /*  37*/ @"8",
-    /*  38*/ @"9",
-    /*  39*/ @"0",
-    /*  40*/ @"Return",
-    /*  41*/ @"Esc",
-    /*  42*/ @"Backspace",
-    /*  43*/ @"Tab",
-    /*  44*/ @"Space",
-    /*  45*/ @"ß",
-    /*  46*/ @"´",
-    /*  47*/ @"Ü",
-    /*  48*/ @"+",
-    /*  49*/ @"Ö",
-    /*  50*/ @"Ä",
-    /*  51*/ @"#",
-    /*  52*/ @"",
-    /*  53*/ @"<",
-    /*  54*/ @",",
-    /*  55*/ @".",
-    /*  56*/ @"-",
-    /*  57*/ @"",
-    /*  58*/ @"F1",
-    /*  59*/ @"F2",
-    /*  60*/ @"F3",
-    /*  61*/ @"F4",
-    /*  62*/ @"F5",
-    /*  63*/ @"F6",
-    /*  64*/ @"F7",
-    /*  65*/ @"F8",
-    /*  66*/ @"F9",
-    /*  67*/ @"F10",
-    /*  68*/ @"F11",
-    /*  69*/ @"F12",
-    /*  70*/ @"",
-    /*  71*/ @"",
-    /*  72*/ @"",
-    /*  73*/ @"",
-    /*  74*/ @"Home",
-    /*  75*/ @"PageUp",
-    /*  76*/ @"Delete",
-    /*  77*/ @"End",
-    /*  78*/ @"PageDown",
-    /*  79*/ @"Right",
-    /*  80*/ @"Left",
-    /*  81*/ @"Down",
-    /*  82*/ @"Up",
-    /*  83*/ @"Num-Clear",
-    /*  84*/ @"Num-/",
-    /*  85*/ @"Num-*",
-    /*  86*/ @"Num--",
-    /*  87*/ @"Num-+",
-    /*  88*/ @"Num-Enter",
-    /*  89*/ @"Num-1",
-    /*  90*/ @"Num-2",
-    /*  91*/ @"Num-3",
-    /*  92*/ @"Num-4",
-    /*  93*/ @"Num-5",
-    /*  94*/ @"Num-6",
-    /*  95*/ @"Num-7",
-    /*  96*/ @"Num-8",
-    /*  97*/ @"Num-9",
-    /*  98*/ @"Num-0",
-    /*  99*/ @"Num-,",
-    /*  100*/ @"^",
-    /*  101*/ @"",
-    /*  102*/ @"",
-    /*  103*/ @"Num-=",
-    /*  104*/ @"F13",
-    /*  105*/ @"F14",
-    /*  106*/ @"F15",
-    /*  107*/ @"F16",
-    /*  108*/ @"F17",
-    /*  109*/ @"F18",
-    /*  110*/ @"F19"
+// We only list special keycodes that cannot be resolved with the
+// modified or unmodified input.
+CharacterTable keycodes_ios[] = {
+    { 40, "Return" },
+    { 41, "Esc" },
+    { 42, "Backspace" },
+    { 43, "Tab" },
+    { 44, "Space" },
+    { 57, "Caps-Lock" },
+    { 58, "F1" },
+    { 59, "F2" },
+    { 60, "F3" },
+    { 61, "F4" },
+    { 62, "F5" },
+    { 63, "F6" },
+    { 64, "F7" },
+    { 65, "F8" },
+    { 66, "F9" },
+    { 67, "F10" },
+    { 68, "F11" },
+    { 69, "F12" },
+    { 74, "Home" },
+    { 75, "PageUp" },
+    { 76, "Delete" },
+    { 77, "End" },
+    { 78, "PageDown" },
+    { 79, "Right" },
+    { 80, "Left" },
+    { 81, "Down" },
+    { 82, "Up" },
+    { 83, "Num-Clear" },
+    { 84, "Num-/" },
+    { 85, "Num-*" },
+    { 86, "Num--" },
+    { 87, "Num-+" },
+    { 88, "Num-Enter" },
+    { 89, "Num-1" },
+    { 90, "Num-2" },
+    { 91, "Num-3" },
+    { 92, "Num-4" },
+    { 93, "Num-5" },
+    { 94, "Num-6" },
+    { 95, "Num-7" },
+    { 96, "Num-8" },
+    { 97, "Num-9" },
+    { 98, "Num-0" },
+    { 99, "Num-," },
+    { 103, "Num-=" },
+    { 104, "F13" },
+    { 105, "F14" },
+    { 106, "F15" },
+    { 107, "F16" },
+    { 108, "F17" },
+    { 109, "F18" },
+    { 110, "F19" }
 };
-
-#if 0
-// Keycode mapping for a german keyboard
-// Map the keycode from CGEventGetIntegerValueField(event, kCGKeyboardEventKeycode)
-static NSString *keycodemapping[] = {
-    /*  0*/ @"A",
-    /*  1*/ @"S",
-    /*  2*/ @"D",
-    /*  3*/ @"F",
-    /*  4*/ @"H",
-    /*  5*/ @"G",
-    /*  6*/ @"Y",
-    /*  7*/ @"X",
-    /*  8*/ @"C",
-    /*  9*/ @"V",
-    /* 10*/ @"^",
-    /* 11*/ @"B",
-    /* 12*/ @"Q",
-    /* 13*/ @"W",
-    /* 14*/ @"E",
-    /* 15*/ @"R",
-    /* 16*/ @"Z",
-    /* 17*/ @"T",
-    /* 18*/ @"1",
-    /* 19*/ @"2",
-    /* 20*/ @"3",
-    /* 21*/ @"4",
-    /* 22*/ @"6",
-    /* 23*/ @"5",
-    /* 24*/ @"´",
-    /* 25*/ @"9",
-    /* 26*/ @"7",
-    /* 27*/ @"ß",
-    /* 28*/ @"8",
-    /* 29*/ @"0",
-    /* 30*/ @"+",
-    /* 31*/ @"O",
-    /* 32*/ @"U",
-    /* 33*/ @"Ü",
-    /* 34*/ @"I",
-    /* 35*/ @"P",
-    /* 36*/ @"Return",
-    /* 37*/ @"L",
-    /* 38*/ @"J",
-    /* 39*/ @"Ä",
-    /* 40*/ @"K",
-    /* 41*/ @"Ö",
-    /* 42*/ @"#",
-    /* 43*/ @",",
-    /* 44*/ @"-",
-    /* 45*/ @"N",
-    /* 46*/ @"M",
-    /* 47*/ @".",
-    /* 48*/ @"Tab",
-    /* 49*/ @"Space",
-    /* 50*/ @"<",
-    /* 51*/ @"Backspace",
-    /* 52*/ @"Unknown",
-    /* 53*/ @"Esc",
-    /* 54*/ @"Unknown",
-    /* 55*/ @"Command",
-    /* 56*/ @"Shift",
-    /* 57*/ @"CapsLock",
-    /* 58*/ @"Opt",
-    /* 59*/ @"Ctrl",
-    /* 60*/ @"RightShift",
-    /* 61*/ @"RightOpt",
-    /* 62*/ @"RightCtrl",
-    /* 63*/ @"Fn",
-    /* 64*/ @"F17",
-    /* 65*/ @"Num-,",
-    /* 66*/ @"Unknown",
-    /* 67*/ @"Num-*",
-    /* 68*/ @"Unknown",
-    /* 69*/ @"Num-+",
-    /* 70*/ @"Unknown",
-    /* 71*/ @"Num-Clear",
-    /* 72*/ @"Unknown",
-    /* 73*/ @"Unknown",
-    /* 74*/ @"Unknown",
-    /* 75*/ @"Num-/",
-    /* 76*/ @"Num-Enter",
-    /* 77*/ @"Unknown",
-    /* 78*/ @"Num--",
-    /* 79*/ @"F18",
-    /* 80*/ @"F19",
-    /* 81*/ @"Num-=",
-    /* 82*/ @"Num-0",
-    /* 83*/ @"Num-1",
-    /* 84*/ @"Num-2",
-    /* 85*/ @"Num-3",
-    /* 86*/ @"Num-4",
-    /* 87*/ @"Num-5",
-    /* 88*/ @"Num-6",
-    /* 89*/ @"Num-7",
-    /* 90*/ @"Unknown",
-    /* 91*/ @"Num-8",
-    /* 92*/ @"Num-9",
-    /* 93*/ @"Unknown",
-    /* 94*/ @"Unknown",
-    /* 95*/ @"Unknown",
-    /* 96*/ @"F5",
-    /* 97*/ @"F6",
-    /* 98*/ @"F7",
-    /* 99*/ @"F3",
-    /*100*/ @"F8",
-    /*101*/ @"F9",
-    /*102*/ @"Unknown",
-    /*103*/ @"F11",
-    /*104*/ @"Unknown",
-    /*105*/ @"F13",
-    /*106*/ @"F16",
-    /*107*/ @"F14",
-    /*108*/ @"Unknown",
-    /*109*/ @"F10",
-    /*110*/ @"Unknown",
-    /*111*/ @"F12",
-    /*112*/ @"Unknown",
-    /*113*/ @"F15",
-    /*114*/ @"Help",
-    /*115*/ @"Home",
-    /*116*/ @"PageUp",
-    /*117*/ @"Delete",
-    /*118*/ @"F4",
-    /*119*/ @"End",
-    /*120*/ @"F2",
-    /*121*/ @"PageDown",
-    /*122*/ @"F1",
-    /*123*/ @"Left",
-    /*124*/ @"Right",
-    /*125*/ @"Down",
-    /*126*/ @"Up",
-    /*127*/ @"Unknown",
-};
-
-#endif
-
-typedef struct CharacterTable {
-    UniChar charactercode;
-    char *keyname;
-} CharacterTable;
 
 CharacterTable chartab[] = {
     { 0x3, "Num-Enter" },
@@ -476,12 +284,101 @@ CharacterTable chartab[] = {
     { 0xf739, "Num-Clear" }
 };
 
+#pragma mark - OS X
+
+CharacterTable specialchartab[] = {
+    { 0x3, "Num-Enter" },
+    { 0x9, "Tab" },
+    { 0xd, "Return" },
+    { 0x1b, "Esc" },
+    { 0x20, "Space" },
+    { 0x7f, "Backspace" },
+};
+
+// These are for a german keyboard.
+
+CharacterTable specialkeycodes[] = {
+    { 0xa, "^" },
+    { 0x18, "´" },
+};
+
+#if TARGET_OS_IPHONE
+
+enum {
+    NSUpArrowFunctionKey        = 0xF700,
+    NSDownArrowFunctionKey      = 0xF701,
+    NSLeftArrowFunctionKey      = 0xF702,
+    NSRightArrowFunctionKey     = 0xF703,
+    NSF1FunctionKey             = 0xF704,
+    NSF2FunctionKey             = 0xF705,
+    NSF3FunctionKey             = 0xF706,
+    NSF4FunctionKey             = 0xF707,
+    NSF5FunctionKey             = 0xF708,
+    NSF6FunctionKey             = 0xF709,
+    NSF7FunctionKey             = 0xF70A,
+    NSF8FunctionKey             = 0xF70B,
+    NSF9FunctionKey             = 0xF70C,
+    NSF10FunctionKey            = 0xF70D,
+    NSF11FunctionKey            = 0xF70E,
+    NSF12FunctionKey            = 0xF70F,
+    NSF13FunctionKey            = 0xF710,
+    NSF14FunctionKey            = 0xF711,
+    NSF15FunctionKey            = 0xF712,
+    NSF16FunctionKey            = 0xF713,
+    NSF17FunctionKey            = 0xF714,
+    NSF18FunctionKey            = 0xF715,
+    NSF19FunctionKey            = 0xF716,
+    NSDeleteFunctionKey         = 0xF728,
+    NSHomeFunctionKey           = 0xF729,
+    NSEndFunctionKey            = 0xF72B,
+    NSPageUpFunctionKey         = 0xF72C,
+    NSPageDownFunctionKey       = 0xF72D,
+    NSClearLineFunctionKey      = 0xF739,
+};
+
+#endif
+
+#if !TARGET_OS_IPHONE
+
+static CharacterTable functionkeys[] = {
+    { NSUpArrowFunctionKey,      "Up" },
+    { NSDownArrowFunctionKey,    "Down" },
+    { NSLeftArrowFunctionKey,    "Left" },
+    { NSRightArrowFunctionKey,   "Right" },
+    { NSF1FunctionKey,           "F1" },
+    { NSF2FunctionKey,           "F2" },
+    { NSF3FunctionKey,           "F3" },
+    { NSF4FunctionKey,           "F4" },
+    { NSF5FunctionKey,           "F5" },
+    { NSF6FunctionKey,           "F6" },
+    { NSF7FunctionKey,           "F7" },
+    { NSF8FunctionKey,           "F8" },
+    { NSF9FunctionKey,           "F9" },
+    { NSF10FunctionKey,          "F10" },
+    { NSF11FunctionKey,          "F11" },
+    { NSF12FunctionKey,          "F12" },
+    { NSF13FunctionKey,          "F13" },
+    { NSF14FunctionKey,          "F14" },
+    { NSF15FunctionKey,          "F15" },
+    { NSF16FunctionKey,          "F16" },
+    { NSF17FunctionKey,          "F17" },
+    { NSF18FunctionKey,          "F18" },
+    { NSF19FunctionKey,          "F19" },
+    { NSDeleteFunctionKey,       "Delete" },
+    { NSHomeFunctionKey,         "Home" },
+    { NSEndFunctionKey,          "End" },
+    { NSPageUpFunctionKey,       "PageUp" },
+    { NSPageDownFunctionKey,     "PageDown" },
+    { NSClearLineFunctionKey,    "Num-Clear" }
+};
+
+#endif
 
 @implementation RLOCharacterMapping
 
 #if TARGET_OS_IPHONE
 
-+ (NSString *)stringForKeycode:(UniChar)keycode
++ (NSString *)stringForIOS6Keycode:(UniChar)keycode
 {
     NSString *result;
     if (keycode < sizeof(keycodemapping_ios_german) / sizeof(*keycodemapping_ios_german)) {
@@ -495,21 +392,88 @@ CharacterTable chartab[] = {
 
 #endif
 
-#if !TARGET_OS_IPHONE
-
-+ (NSString *)stringForKeycode:(int64_t)keycode
++ (NSString *)stringForCharactersIgnoringModifiers:(NSString *)characters
 {
-    NSString *result;
-    if (keycode < sizeof(keycodemapping_osx_german) / sizeof(*keycodemapping_osx_german)) {
-        result = keycodemapping_osx_german[keycode];
-    } else {
-        result = @"Unknown";
+    UniChar c = 0;
+    if (characters.length == 1) {
+        c = [characters characterAtIndex:0];
     }
     
-    return result;
+#if !TARGET_OS_IPHONE
+    // Handle functions keys
+    
+    if (characters.length == 1) {
+        // See NSEvent.h
+        if (c >= 0xF700 && c <= 0xF8FF) {
+            for (int j=0; j < sizeof(functionkeys) / sizeof(*functionkeys); j++) {
+                if (functionkeys[j].charactercode == c) {
+                    return [NSString stringWithUTF8String:functionkeys[j].keyname];
+                }
+            }
+        }
+    }
+#endif
+    
+    // Handle printable characters
+    
+    NSCharacterSet *printableCharacterSet = [NSCharacterSet alphanumericCharacterSet];
+    if (characters.length == 1) {
+        UniChar c = [characters characterAtIndex:0];
+        if ((c <= 0x7F && isprint(c))
+            || (c >= 0x80 && c <= 0xFF)
+            || [printableCharacterSet characterIsMember:c]) {
+            NSString *uppercase = [characters uppercaseString];
+            return uppercase.length == 1 ? uppercase : characters;
+        }
+    }
+
+    return nil;
 }
 
++ (NSString *)stringForKeycode:(UniChar)keycode characters:(NSString *)characters charactersIgnoringModifiers:(NSString *)charactersIgnoringModifiers
+{
+#if TARGET_OS_IPHONE
+    if (RLOGetInt(@"rlo.simulator_keyboard_german", 0)) {
+        return [self stringForIOS6Keycode:keycode];
+    }
 #endif
+
+    NSString *printable_result = [self stringForCharactersIgnoringModifiers:charactersIgnoringModifiers];
+    if (printable_result) {
+        return printable_result;
+    }
+    
+#if !TARGET_OS_IPHONE
+
+    if (charactersIgnoringModifiers.length == 1) {
+        UniChar c = [charactersIgnoringModifiers characterAtIndex:0];
+        for (int j=0; j < sizeof(specialchartab) / sizeof(*specialchartab); j++) {
+            if (specialchartab[j].charactercode == c) {
+                return [NSString stringWithUTF8String:specialchartab[j].keyname];
+            }
+        }
+    }
+
+    // Handle dead keys via keycode
+
+    for (int j=0; j < sizeof(specialkeycodes) / sizeof(*specialkeycodes); j++) {
+        if (specialkeycodes[j].charactercode == keycode) {
+            return [NSString stringWithUTF8String:specialkeycodes[j].keyname];
+        }
+    }
+    
+#else
+
+    for (int j=0; j < sizeof(keycodes_ios) / sizeof(*keycodes_ios); j++) {
+        if (keycodes_ios[j].charactercode == keycode) {
+            return [NSString stringWithUTF8String:keycodes_ios[j].keyname];
+        }
+    }
+    
+#endif
+
+    return @"Unknown";
+}
 
 + (NSString *)keynameForCharacters:(NSString *)text
 {
@@ -570,6 +534,26 @@ CharacterTable chartab[] = {
     }
     
     return [array componentsJoinedByString:@"-"];
+}
+
++ (NSString *)modifiedCharnames:(NSString *)charnames characters:(NSString *)characters modifierFlags:(NSUInteger)modifierFlags
+{
+#if !TARGET_OS_IPHONE
+    if (characters.length == 1) {
+        UniChar c = [characters characterAtIndex:0];
+        if (c == NSUpArrowFunctionKey
+            || c == NSDownArrowFunctionKey
+            || c == NSLeftArrowFunctionKey
+            || c == NSRightArrowFunctionKey) {
+            // The cursor keys have the NSNumericPadKeyMask set
+            // but we prefer getting 'Right' instead of 'Num-Right'.
+            if (modifierFlags & NSNumericPadKeyMask) {
+                modifierFlags = modifierFlags & ~NSNumericPadKeyMask;
+            }
+        }
+    }
+#endif
+    return [self modifiedCharnames:charnames modifierFlags:modifierFlags];
 }
 
 @end
