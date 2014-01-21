@@ -220,8 +220,6 @@ typedef struct __GSEvent* GSEventRef;
     } else {
         NSDictionary *keyinfo = pressedkeys[@(keycode)];
         key = keyinfo[@"key"];
-        unmodifiedInput = keyinfo[@"unmodifiedInput"];
-        modifiedInput = keyinfo[@"modifiedInput"];
         [pressedkeys removeObjectForKey:@(keycode)];
     }
     

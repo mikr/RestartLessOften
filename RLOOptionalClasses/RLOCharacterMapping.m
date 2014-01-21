@@ -418,7 +418,6 @@ static CharacterTable functionkeys[] = {
     
     NSCharacterSet *printableCharacterSet = [NSCharacterSet alphanumericCharacterSet];
     if (characters.length == 1) {
-        UniChar c = [characters characterAtIndex:0];
         if ((c <= 0x7F && isprint(c))
             || (c >= 0x80 && c <= 0xFF)
             || [printableCharacterSet characterIsMember:c]) {
