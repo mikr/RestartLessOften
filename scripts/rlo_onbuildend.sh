@@ -5,6 +5,9 @@
 # Copyright (c) 2010-2013 Michael Krause ( http://krause-software.com/ ). All rights reserved.
 #
 
+set -e
+set -u
+
 if [ "$PRODUCT_TYPE" = "com.apple.product-type.bundle" -o "$PRODUCT_TYPE" = "com.apple.product-type.bundle.unit-test" ]; then
 	# The bundle build is finished
 

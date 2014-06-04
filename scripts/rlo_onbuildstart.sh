@@ -7,6 +7,7 @@
 #
 
 set -e
+set -u
 
 if [ "$TARGET_NAME" == "$PRODUCT_NAME" ] \
     && [ "$PRODUCT_TYPE" = "com.apple.product-type.application" ] \
