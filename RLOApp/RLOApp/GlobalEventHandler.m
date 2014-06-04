@@ -66,7 +66,8 @@ CGEventRef KeyHandler(CGEventTapProxy proxy, CGEventType type, CGEventRef event,
         } else if (type == kCGEventKeyUp) {
             eventtype = @"KeyUp";
         }
-        NSString *key = [RLOCharacterMapping stringForKeycode:keycode];
+        NSString *characters = [NSString stringWithCharacters:chars length:actualStringLength];
+        NSString *key = [RLOCharacterMapping stringForKeycode:keycode characters:characters charactersIgnoringModifiers:characters];
         
         NSMutableArray *array = [[NSMutableArray alloc] init];
         if (flags & kCGEventFlagMaskCommand) {
