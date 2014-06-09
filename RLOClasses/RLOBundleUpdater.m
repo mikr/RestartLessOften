@@ -26,6 +26,7 @@
 #endif
 
 
+#define RLO_BUNDLENAME @"RLOUpdaterBundle"
 
 // To use simple polling of the bundle modification date instead of  filesystem events set this value to 0.
 #define RLO_FSEVENTS_INTERVAL 0.01
@@ -62,7 +63,7 @@
 
 + (void)startChecking:(RLOCheckMethod)method
 {
-    RLOAddResponseHandler(NSClassFromString(@"RLOBundleUpdater"));
+    RLOAddResponseHandler(self);
 
 #if TARGET_OS_EMBEDDED
     // Polling the filesystem for a freshly changed bundle makes no sense on a device.
@@ -381,6 +382,46 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     [[NSNotificationCenter defaultCenter] postNotificationName:RLOTIfiNotification object:[self class] userInfo:aUserInfo];
 }
 
+/*
+ * This method removes the bundle name from a mangled swift class name and adapts the
+ * length of the resulting class name in the mangled encoding.
+ * E.g.:
+ *     [self classNameForBundleClassname:@"_TtC27RLOUpdaterBundleDrawExample10SwiftyView" bundleName:@"RLOUpdaterBundle"]
+ *     returns @"_TtC11DrawExample10SwiftyView"
+ */
++ (NSString *)classNameForBundleClassname:(NSString *)bundleClassname bundleName:(NSString *)bundleName
+{
+    NSRange r = [bundleClassname rangeOfString:bundleName];
+    if (r.location == NSNotFound || r.location == 0) {
+        // There should be a number preceding the bundleName.
+        return nil;
+    }
+    NSString *suffix = [bundleClassname substringFromIndex:NSMaxRange(r)];
+    NSInteger digitloc = r.location - 1;
+    NSUInteger numberbegin = r.location;
+    do {
+        UniChar digit = [bundleClassname characterAtIndex:digitloc];
+        if (digit >= '0' && digit <= '9') {
+            numberbegin = digitloc;
+            digitloc--;
+        } else {
+            break;
+        }
+    } while (digitloc >= 0);
+    
+    if (numberbegin == r.location) {
+        // No number found
+        return nil;
+    }
+    
+    NSString *numstring = [bundleClassname substringWithRange:NSMakeRange(numberbegin, r.location - numberbegin)];
+    NSString *prefix = [bundleClassname substringToIndex:numberbegin];
+    NSInteger cnlength = [numstring integerValue];
+    cnlength -= [bundleName length];
+    NSString *origClassName = [NSString stringWithFormat:@"%@%ld%@", prefix, cnlength, suffix];
+    return origClassName;
+}
+
 + (NSSet *)changedClassNames:(NSSet *)classesSet
 {
     NSMutableSet *result = [[NSMutableSet alloc] init];
@@ -583,7 +624,17 @@ typedef NS_ENUM(NSUInteger, KeyEventMode) {
         if ([className hasPrefix:@"__"] && [className hasSuffix:@"__"]) {
             // Skip some O_o classes
         } else {
-            [self performInjectionWithClass:clz];
+            NSString *origClassName = [self classNameForBundleClassname:className bundleName:RLO_BUNDLENAME];
+            if (origClassName) {
+                Class originalClass = NSClassFromString(origClassName);
+                if (originalClass) {
+                    [self performInjectionWithClass:clz originalClass:originalClass];
+                } else {
+                    RLOLog(@"RLOBundleUpdater could not replace class %@ with new class %@ from bundle", origClassName, className);
+                }
+            } else {
+                [self performInjectionWithClass:clz];
+            }
         }
     }
 }
@@ -627,6 +678,15 @@ typedef NS_ENUM(NSUInteger, KeyEventMode) {
     }
 }
 
++ (void)performInjectionWithClass:(Class)injectedClass originalClass:(Class)originalClass
+{
+    // Replacing instance methods
+    [self replaceMethodsOfClass:originalClass withMethodsOfClass:injectedClass];
+    
+    // Additionally we need to update Class methods (not instance methods) implementations
+    [self replaceMethodsOfClass:object_getClass(originalClass) withMethodsOfClass:object_getClass(injectedClass)];
+}
+
 + (void)performInjectionWithClass:(Class)injectedClass
 {
     // This is really fun
@@ -634,12 +694,7 @@ typedef NS_ENUM(NSUInteger, KeyEventMode) {
     // NSClassFromString Will return FIRST(Original) Instance. And this is cool!
     NSString * className = [NSString stringWithFormat:@"%s", class_getName(injectedClass)];
     Class originalClass = NSClassFromString(className);
-    
-    // Replacing instance methods
-    [self replaceMethodsOfClass:originalClass withMethodsOfClass:injectedClass];
-    
-    // Additionally we need to update Class methods (not instance methods) implementations
-    [self replaceMethodsOfClass:object_getClass(originalClass) withMethodsOfClass:object_getClass(injectedClass)];
+    [self performInjectionWithClass:injectedClass originalClass:originalClass];
 }
 
 //=======================================================================
