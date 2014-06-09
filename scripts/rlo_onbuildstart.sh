@@ -43,6 +43,25 @@ if [ "$PRODUCT_TYPE" = "com.apple.product-type.bundle" -o "$PRODUCT_TYPE" = "com
 	    clang -arch "$CURRENT_ARCH" -isysroot $SDKROOT $MM -o "$BUNDLE_LOADER"
 	fi
     CMDDIR=$(dirname $0)
+
+    if [ "$PLATFORM_NAME" = "macosx" ]; then
+        # From Xcode 6.0.beta on xctest bundles always link against XCTest.framework
+        # which isn't found when loading the bundle with dlopen(). We create a softlink for this to succeed.
+        TF_PATHS=${TEST_FRAMEWORK_SEARCH_PATHS:-}
+        if [ -n "$TF_PATHS" ]; then
+            FWNAME="XCTest.framework"
+            XCTEST_LINK="$BUILT_PRODUCTS_DIR/$FWNAME"
+            if [ ! -L "$XCTEST_LINK" ]; then
+                for p in $TF_PATHS; do
+                    FW="$p/$FWNAME"
+                    if [ -e "$FW" ]; then
+                        ( cd $BUILT_PRODUCTS_DIR && ln -s $FW $FWNAME )
+                        break
+                    fi
+                done
+            fi
+        fi
+    fi
     $CMDDIR/rlo_newerfiles.py -f "${BUNDLE_LOADER}" -p "${PROJECT_DIR}"
 
 	# Record the start time of the build as a floating point number expressed in seconds since the epoch, in UTC.

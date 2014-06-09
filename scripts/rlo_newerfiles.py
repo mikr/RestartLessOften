@@ -18,7 +18,7 @@ REBUILD_CODE_FILENAME = "RLORebuildCode/RLORebuildCode.m"
 
 
 re_rlo_starttime = re.compile("""RLOBundleUpdater load: (\d+\.\d+)""", re.MULTILINE)
-re_rlo_nmsol = re.compile("""^(?:00000000){1,2} - 00 0000\s+SO(L)? (.*)""", re.MULTILINE)
+re_rlo_nm_segment = re.compile("""^(?:00000000){1,2} - 00 0000\s+(SO|SOL|OSO) (.*)""", re.MULTILINE)
 
 def last_program_start():
     latest_timestamp = None
@@ -56,7 +56,7 @@ def cleaned_sonames(sonames):
     return fullset
 
 def find_newerfiles(filename, projectdir):
-    commandAndArgs = '/usr/bin/nm -U %s' % (filename,)
+    commandAndArgs = '/usr/bin/nm -aU %s' % (filename,)
     proc = subprocess.Popen(commandAndArgs, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # latest_appstart is probably no longer needed.
@@ -72,12 +72,12 @@ def find_newerfiles(filename, projectdir):
     exetime = os.path.getmtime(filename)
     sourcenames = set()
     sonames = set()
-    for m in re_rlo_nmsol.finditer(stdout):
-        sol, sourcename = m.groups(1)
-        if sol == 'L':
+    for m in re_rlo_nm_segment.finditer(stdout):
+        segtype, sourcename = m.groups(1)
+        if segtype == 'SOL':
             sourcename = os.path.abspath(sourcename)
             sourcenames.add(sourcename)
-        else:
+        elif segtype in ['SO', 'OSO']:
             sonames.add(sourcename)
     sourcenames.update(cleaned_sonames(sonames))
     sourcenames = sorted(list(sourcenames))
