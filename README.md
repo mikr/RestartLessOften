@@ -1,6 +1,6 @@
 # RestartLessOften
 
-When programming an iOS or OS X application in Objective-C almost every minor parameter or code change requires a recompilation of the changed sources followed by an application restart to see the change.
+When programming an iOS or OS X application in Objective-C or Swift almost every minor parameter or code change requires a recompilation of the changed sources followed by an application restart to see the change.
 
 This project offers some tools to reduce the number of restarts when adjusting numbers, strings, colors, images, OpenGL shaders, xib files and so forth even code changes can be done with limitations.
 
@@ -21,6 +21,8 @@ In GLExample at the end of `ViewController.m` you see `self.paused = NO;`. Chang
 If you get this running you can try to run GLExample on an iOS device which should also work but this is usually more likely to fail. Change `self.paused` several times between YES and NO and build and see if it works for you.
 
 DrawExample is a simple Cocoa app with a `-drawRect:` method in `DrawView.m` that you can modify as well at runtime. Try commenting out some drawing code and just build.
+
+MixedDrawExample is effectively DrawExample with an additional view written in Swift. The code of both the Objective-C and the Swift view can be changed at runtime without restarting.
 
 `InstallingRLO.md` explaines all steps necessary to add RestartLessOften into an existing app. There are quite some steps and if you follow everything correctly the code updates still might not work.
 `RefactoringForRLO.md` explains how to restructure your code to make better use of RLO.
