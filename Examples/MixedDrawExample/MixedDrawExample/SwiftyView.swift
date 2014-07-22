@@ -9,9 +9,9 @@
 import Cocoa
 
 extension NSGraphicsContext {
-    var cgContext : CGContext {
-    let opaqueContext = COpaquePointer(self.graphicsPort())
-        return Unmanaged<CGContext>.fromOpaque(opaqueContext).takeUnretainedValue()
+    var cgContext : CGContextRef {
+    let opaqueContext = COpaquePointer(self.graphicsPort)
+        return Unmanaged<CGContextRef>.fromOpaque(opaqueContext).takeUnretainedValue()
     }
 }
 
@@ -36,7 +36,7 @@ class SwiftyView: NSView {
         let numshapes = 40
         for i in 0..<numshapes {
             CGContextSetRGBFillColor(ctx, 0, 0.5, 0, 1)
-            CGContextFillRect(ctx, CGRectMake(10 + CGFloat(i) * 12.0, 50 + 30 * sin(CDouble(i) * 2.0 * 3.141592653589793 / CDouble(numshapes)), 10, 10))
+            CGContextFillRect(ctx, CGRectMake(10 + CGFloat(i) * 12.0, 50 + 30 * CGFloat(sin(CDouble(i)) * 2.0 * 3.141592653589793 / CDouble(numshapes)), 10, 10))
         }
     }
     

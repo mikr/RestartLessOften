@@ -418,7 +418,7 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
     NSString *prefix = [bundleClassname substringToIndex:numberbegin];
     NSInteger cnlength = [numstring integerValue];
     cnlength -= [bundleName length];
-    NSString *origClassName = [NSString stringWithFormat:@"%@%ld%@", prefix, cnlength, suffix];
+    NSString *origClassName = [NSString stringWithFormat:@"%@%ld%@", prefix, (long)cnlength, suffix];
     return origClassName;
 }
 
