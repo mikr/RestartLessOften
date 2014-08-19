@@ -391,7 +391,13 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
  */
 + (NSString *)classNameForBundleClassname:(NSString *)bundleClassname bundleName:(NSString *)bundleName
 {
-    NSRange r = [bundleClassname rangeOfString:bundleName];
+    NSRange r = [bundleClassname rangeOfString:@"."];
+    if (r.location != NSNotFound && [bundleClassname hasPrefix:bundleName]) {
+        // The classname in the bundle is something like 'RLOUpdaterBundleMixedDrawExample.SwiftyView'.
+        // The original classname is the same with the bundle name prefix removed.
+        return [bundleClassname substringFromIndex:bundleName.length];
+    }
+    r = [bundleClassname rangeOfString:bundleName];
     if (r.location == NSNotFound || r.location == 0) {
         // There should be a number preceding the bundleName.
         return nil;
