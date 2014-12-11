@@ -31,7 +31,7 @@ class SwiftyView: NSView {
     override func drawRect(dirtyRect: NSRect) {
         super.drawRect(dirtyRect)
 
-        let ctx = NSGraphicsContext.currentContext().cgContext;
+        let ctx = NSGraphicsContext.currentContext()!.cgContext;
         
         let numshapes = 40
         for i in 0..<numshapes {
