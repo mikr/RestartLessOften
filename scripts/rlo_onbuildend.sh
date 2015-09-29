@@ -19,7 +19,10 @@ if [ "$PRODUCT_TYPE" = "com.apple.product-type.bundle" -o "$PRODUCT_TYPE" = "com
 	    BUNDLE_LOCATION="${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}"
 	    URL="http://localhost:8080/announcebundle"
 	    read RLObuildstart 2>/dev/null < ${PROJECT_TEMP_DIR}/RLObuildstart.txt
+	    # Allow curl to exit with a non-zero code
+	    set +e
 	    /usr/bin/curl --fail --silent --data-urlencode "srcroot=${SRCROOT}" --data-urlencode "bundlelocation=${BUNDLE_LOCATION}"  --data-urlencode "rlobuildstart=${RLObuildstart}" "$URL"
+	    set -e
 	    true
 	fi
 else
