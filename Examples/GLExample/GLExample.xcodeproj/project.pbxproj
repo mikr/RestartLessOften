@@ -716,7 +716,10 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "RLOUpdaterBundleGLExample/RLOUpdaterBundleGLExample-Info.plist";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
@@ -737,7 +740,10 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "RLOUpdaterBundleGLExample/RLOUpdaterBundleGLExample-Prefix.pch";
 				INFOPLIST_FILE = "RLOUpdaterBundleGLExample/RLOUpdaterBundleGLExample-Info.plist";
-				OTHER_LDFLAGS = "";
+				OTHER_LDFLAGS = (
+					"-weak_framework",
+					XCTest,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = xctest;
