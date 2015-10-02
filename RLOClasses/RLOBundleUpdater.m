@@ -348,6 +348,9 @@ void fsevents_callback(ConstFSEventStreamRef streamRef,
         currentClassesSet = [self currentClassesSet];
         [currentClassesSet minusSet:classesSet];
         success = libHandle && !err && [currentClassesSet count];
+        if (err) {
+            RLOLog(@"Error: %s", err);
+        }
     }
     
     if (supress_warning) {
