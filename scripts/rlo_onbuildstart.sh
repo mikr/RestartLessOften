@@ -18,7 +18,7 @@ if [ "$TARGET_NAME" == "$PRODUCT_NAME" ] \
     if [ "$GCC_SYMBOLS_PRIVATE_EXTERN" = "NO" ] ; then
         echo "This looks like a build for deployment"
         echo "GCC_SYMBOLS_PRIVATE_EXTERN (Symbols Hidden by Default) should probably be YES but is NO."
-        # exit 1
+        exit 0
     fi
 fi
 
@@ -74,7 +74,7 @@ else
 	INCDIR=${TARGET_BUILD_DIR}/include
 	test -d $INCDIR || mkdir -p $INCDIR
 
-    LOCALHOSTNAME="$(/bin/hostname -s).local"
+    LOCALHOSTNAME="$(/bin/hostname -s)"
 
     if [ $# -eq 1 ]; then
     	BUNDLENAME="$1"
