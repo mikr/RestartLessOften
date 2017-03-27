@@ -16,7 +16,6 @@
 #define RLOLogRED(s, ...) NSLog((s), ##__VA_ARGS__)
 #define RLOLogGREEN(s, ...) NSLog((s), ##__VA_ARGS__)
 #define RLOLogBLUE(s, ...) NSLog((s), ##__VA_ARGS__)
-#define DebugDecorateM(s) (s)
 #else
 #define RLOLogRED DebugLogRED
 #define RLOLogGREEN DebugLogGREEN
@@ -34,6 +33,9 @@
 
 #define kShowNonDefaultVars @"rlo.show_nondefault_vars"
 
+#ifndef DebugDecorateM
+#define DebugDecorateM(s) (s)
+#endif
 #define logNonDefaultVar(s, ...) NSLog(DebugDecorateM(s), ##__VA_ARGS__)
 
 #define RLOCONF_LOADER_SUCCEEDED 0
@@ -361,7 +363,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     if (! rlo_vars_dict)
         return nil;
     
-    NSString *filename = [aFilename stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *filename = [aFilename stringByRemovingPercentEncoding];
     NSString *keyname = [NSString stringWithFormat:@"file_%@", filename];
     NSData *v = getDebugValue(keyname);
     if (! v) {
@@ -375,7 +377,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     if (! rlo_vars_dict)
         return;
     
-    NSString *filename = [aFilename stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    NSString *filename = [aFilename stringByRemovingPercentEncoding];
     NSString *keyname = [NSString stringWithFormat:@"file_%@", filename];
     [rlo_vars_dict setObject:value forKey:keyname];
 }
@@ -451,7 +453,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     }
     
     filename = [filename lastPathComponent];
-    filename = [filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    filename = [filename stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     return [NSString stringWithFormat:@"%@/download?&rloconf=%@&filename=%@", http_server, rloconf_filename, filename];
 }
 
@@ -508,6 +510,33 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     return [self downloadFileDirect:(NSString *)filename data:(NSData **)data response:(NSHTTPURLResponse **)response];
 }
 
+// From: https://forums.developer.apple.com/thread/11519
++ (NSData *)sendSynchronousRequest:(NSURLRequest *)request
+                 returningResponse:(__autoreleasing NSURLResponse **)responsePtr
+                             error:(__autoreleasing NSError **)errorPtr
+{
+    dispatch_semaphore_t sem;
+    __block NSData *result;
+    result = nil;
+    sem = dispatch_semaphore_create(0);
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request
+                                     completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                         if (errorPtr != NULL) {
+                                             *errorPtr = error;
+                                         }
+                                         if (responsePtr != NULL) {
+                                             *responsePtr = response;
+                                         }
+                                         if (error == nil) {
+                                             result = data;
+                                         }
+                                         dispatch_semaphore_signal(sem);
+                                     }] resume];
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+
+    return result;
+}
+
 + (BOOL)downloadFileFromURL:(NSString *)theUrl filename:(NSString *)filename data:(NSData **)data response:(NSHTTPURLResponse **)response
 {
     NSError *error = nil;
@@ -516,7 +545,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request setHTTPMethod: @"GET"];
     [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
-    NSData *responsedata = [NSURLConnection sendSynchronousRequest:request returningResponse:response error:&error];
+    NSData *responsedata = [self sendSynchronousRequest:request returningResponse:response error:&error];
     NSArray *components = [filename componentsSeparatedByString:@"&"];
     NSString *name = components.count > 0 ? components[0] : nil;
     
@@ -595,8 +624,8 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     }
     
     filename = [filename lastPathComponent];
-    filename = [filename stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
-    rloconf_filename = [rloconf_filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    filename = [filename stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    rloconf_filename = [rloconf_filename stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     if (! filename) {
         filename = @"";
     }
@@ -607,7 +636,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
         [request setHTTPMethod:@"POST"];
         [request setHTTPBody:data];
     }
-    NSData *responsedata = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSData *responsedata = [self sendSynchronousRequest:request returningResponse:&response error:&error];
     if ([responsedata length] > 0) {
         NSLog(@"responsedata: %@", responsedata);
         return NO;
@@ -644,14 +673,14 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     }
     
     filename = [filename lastPathComponent];
-    filename = [filename stringByAddingPercentEscapesUsingEncoding: NSUTF8StringEncoding];
-    rloconf_filename = [rloconf_filename stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    filename = [filename stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+    rloconf_filename = [rloconf_filename stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
     NSString *request_string = [NSString stringWithFormat:@"%@/upload?rloconf=%@&filename=%@", http_server, rloconf_filename, filename];
     NSURL *url = [NSURL URLWithString:request_string];
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:data];
-    NSData *responsedata = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    NSData *responsedata = [self sendSynchronousRequest:request returningResponse:&response error:&error];
     if ([responsedata length] > 0) {
         NSLog(@"responsedata: %@", responsedata);
         return NO;
@@ -873,9 +902,9 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
         } else if ([value isKindOfClass:[NSArray class]]) {
             // TODO: We cannot generate URLs from array values at the moment
         } else {
-            NSString *parameter = [NSString stringWithFormat:@"%@%@=%@", [keypath stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
-                                   [key stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
-                                   [[value description] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            NSString *parameter = [NSString stringWithFormat:@"%@%@=%@", [keypath stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]],
+                                   [key stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]],
+                                   [[value description] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]];
             [params addObject:parameter];
         }
     }
@@ -1025,7 +1054,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     [image lockFocus];
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, image.size.width, image.size.height)];
     [image unlockFocus];
-    return [[self class] uploadData:[bitmapRep representationUsingType:NSPNGFileType properties:nil] filename:filename];
+    return [[self class] uploadData:[bitmapRep representationUsingType:NSPNGFileType properties:@{}] filename:filename];
 }
 
 #endif
@@ -1054,7 +1083,7 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     [result lockFocus];
     NSBitmapImageRep *bitmapRep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:NSMakeRect(0, 0, result.size.width, result.size.height)];
     [result unlockFocus];
-    return [bitmapRep representationUsingType:NSPNGFileType properties:nil];
+    return [bitmapRep representationUsingType:NSPNGFileType properties:@{}];
 #endif
 }
 
