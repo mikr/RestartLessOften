@@ -45,6 +45,8 @@
 #define RLO_VARTYPE_INTEGER 1
 #define RLO_VARTYPE_FLOAT 2
 
+#define RLO_FIRST_REQUEST_TIMEOUT 1.0
+
 static inline void RLOPrint(NSString *format, ...)
 {
     va_list args;
@@ -545,6 +547,10 @@ static BOOL shouldShowNondefaultVariable(NSString *varname)
     NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:url];
     [request setHTTPMethod: @"GET"];
     [request setValue:@"gzip" forHTTPHeaderField:@"Accept-Encoding"];
+    if (rlo_config_download_request_nr == 0) {
+        // Time out quickly if the RLO server is not running.
+        [request setTimeoutInterval:RLO_FIRST_REQUEST_TIMEOUT];
+    }
     NSData *responsedata = [self sendSynchronousRequest:request returningResponse:response error:&error];
     NSArray *components = [filename componentsSeparatedByString:@"&"];
     NSString *name = components.count > 0 ? components[0] : nil;
